@@ -598,6 +598,19 @@
 
   let previousLoaded = 0;
 
+  // ── Sound engine (Web Audio API) ──
+  let audioCtx = null;
+  function getAudioCtx() {
+    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    if (audioCtx.state === 'suspended') audioCtx.resume();
+    return audioCtx;
+  }
+  // Warm up audio context on any user interaction
+  document.addEventListener('click', function warmUp() {
+    getAudioCtx();
+    document.removeEventListener('click', warmUp);
+  }, { once: true });
+
   function refresh() {
     const n = document.querySelectorAll('.boat-slot.loaded, .checklist-card .item.loaded').length;
     document.getElementById('loadedCount').textContent = n;
@@ -633,7 +646,8 @@
 
     // ── 8-BIT VICTORY FANFARE ──
     function playVictoryFanfare() {
-      const ac = new (window.AudioContext || window.webkitAudioContext)();
+      const ac = getAudioCtx();
+      if (ac.state === 'suspended') ac.resume();
 
       function sq(freq, start, dur, vol) {
         const o = ac.createOscillator();
@@ -1069,13 +1083,6 @@
     });
     refresh();
   });
-
-  // ── Sound engine (Web Audio API) ──
-  let audioCtx = null;
-  function getAudioCtx() {
-    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    return audioCtx;
-  }
 
   function playTick(isBoat) {
     const ctx = getAudioCtx();
