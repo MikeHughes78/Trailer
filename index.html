@@ -373,10 +373,263 @@
   const slots = document.querySelectorAll('.boat-slot');
   document.getElementById('totalCount').textContent = slots.length;
 
+  let previousLoaded = 0;
+
   function refresh() {
     const n = document.querySelectorAll('.boat-slot.loaded').length;
     document.getElementById('loadedCount').textContent = n;
     document.getElementById('progressFill').style.width = ((n / slots.length) * 100) + '%';
+    if (n === slots.length && previousLoaded < slots.length) {
+      celebrate();
+    }
+    previousLoaded = n;
+  }
+
+  function celebrate() {
+    const canvas = document.createElement('canvas');
+    canvas.id = 'confetti-canvas';
+    Object.assign(canvas.style, {
+      position:'fixed', top:'0', left:'0', width:'100%', height:'100%',
+      pointerEvents:'none', zIndex:'9999'
+    });
+    document.body.appendChild(canvas);
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    const ctx = canvas.getContext('2d');
+
+    const colours = ['#E97132','#156082','#196B24','#A02B93','#0F9ED5','#4EA72E','#FFD700','#FF4444','#FF69B4','#00CED1'];
+    const particles = [];
+    const fireworks = [];
+    let startTime = performance.now();
+    let nextWave = 0;
+    let waveCount = 0;
+    const totalWaves = 8;
+    let bannerShown = false;
+    let bannerAlpha = 0;
+    let bannerScale = 0;
+
+    function spawnBurst(ox, oy, count, power) {
+      for (let i = 0; i < count; i++) {
+        const angle = Math.random() * Math.PI * 2;
+        const speed = power * (0.4 + Math.random());
+        const shapes = ['rect','circle','star','streamer'];
+        particles.push({
+          x: ox, y: oy,
+          vx: Math.cos(angle) * speed,
+          vy: Math.sin(angle) * speed - 2,
+          size: 2 + Math.random() * 7,
+          colour: colours[Math.floor(Math.random() * colours.length)],
+          life: 1,
+          decay: 0.003 + Math.random() * 0.005,
+          rotation: Math.random() * 360,
+          rotSpeed: (Math.random() - 0.5) * 15,
+          shape: shapes[Math.floor(Math.random() * shapes.length)],
+          wobble: Math.random() * Math.PI * 2,
+          wobbleSpeed: 0.02 + Math.random() * 0.04
+        });
+      }
+    }
+
+    function spawnFirework(x, y) {
+      fireworks.push({
+        x, y: canvas.height + 10,
+        targetY: y,
+        speed: 6 + Math.random() * 4,
+        colour: colours[Math.floor(Math.random() * colours.length)],
+        exploded: false,
+        trail: []
+      });
+    }
+
+    function drawStar(ctx, size) {
+      ctx.beginPath();
+      for (let i = 0; i < 5; i++) {
+        const angle = (i * 4 * Math.PI) / 5 - Math.PI / 2;
+        const method = i === 0 ? 'moveTo' : 'lineTo';
+        ctx[method](Math.cos(angle) * size, Math.sin(angle) * size);
+      }
+      ctx.closePath();
+      ctx.fill();
+    }
+
+    // Pre-schedule fireworks
+    const fwTimes = [200, 600, 1100, 1700, 2400, 3000, 3500, 4200, 4800, 5500, 6200, 6800];
+    let fwIndex = 0;
+
+    function frame(now) {
+      const elapsed = now - startTime;
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // Spawn confetti waves
+      if (waveCount < totalWaves && elapsed > nextWave) {
+        const positions = [
+          {x: Math.random()*canvas.width, y: canvas.height*0.2 + Math.random()*canvas.height*0.3},
+          {x: Math.random()*canvas.width, y: canvas.height*0.1 + Math.random()*canvas.height*0.3},
+          {x: Math.random()*canvas.width, y: canvas.height*0.2 + Math.random()*canvas.height*0.2},
+        ];
+        positions.forEach(p => spawnBurst(p.x, p.y, 50, 6 + Math.random()*5));
+        nextWave = elapsed + 400 + Math.random() * 600;
+        waveCount++;
+      }
+
+      // Spawn fireworks on schedule
+      while (fwIndex < fwTimes.length && elapsed > fwTimes[fwIndex]) {
+        spawnFirework(
+          canvas.width * (0.15 + Math.random() * 0.7),
+          canvas.height * (0.1 + Math.random() * 0.35)
+        );
+        fwIndex++;
+      }
+
+      // Update & draw fireworks
+      fireworks.forEach(fw => {
+        if (!fw.exploded) {
+          fw.y -= fw.speed;
+          fw.trail.push({x: fw.x, y: fw.y, life: 1});
+          // Draw trail
+          fw.trail.forEach(t => {
+            t.life -= 0.04;
+            if (t.life > 0) {
+              ctx.globalAlpha = t.life * 0.6;
+              ctx.fillStyle = fw.colour;
+              ctx.fillRect(t.x - 1, t.y, 2, 4);
+            }
+          });
+          ctx.globalAlpha = 1;
+          ctx.fillStyle = '#fff';
+          ctx.fillRect(fw.x - 2, fw.y - 2, 4, 4);
+
+          if (fw.y <= fw.targetY) {
+            fw.exploded = true;
+            spawnBurst(fw.x, fw.y, 80, 8);
+          }
+        }
+      });
+
+      // Update & draw particles
+      let alive = false;
+      particles.forEach(p => {
+        if (p.life <= 0) return;
+        alive = true;
+        p.x += p.vx;
+        p.y += p.vy;
+        p.vy += 0.1;
+        p.vx *= 0.99;
+        p.life -= p.decay;
+        p.rotation += p.rotSpeed;
+        p.wobble += p.wobbleSpeed;
+        p.x += Math.sin(p.wobble) * 0.5;
+
+        ctx.save();
+        ctx.translate(p.x, p.y);
+        ctx.rotate(p.rotation * Math.PI / 180);
+        ctx.globalAlpha = Math.max(0, p.life);
+        ctx.fillStyle = p.colour;
+
+        if (p.shape === 'rect') {
+          ctx.fillRect(-p.size/2, -p.size/3, p.size, p.size * 0.5);
+        } else if (p.shape === 'circle') {
+          ctx.beginPath();
+          ctx.arc(0, 0, p.size/2, 0, Math.PI * 2);
+          ctx.fill();
+        } else if (p.shape === 'star') {
+          drawStar(ctx, p.size/2);
+        } else {
+          // Streamer — long thin ribbon
+          ctx.fillRect(-1, -p.size, 2, p.size * 2);
+        }
+        ctx.restore();
+      });
+
+      // Banner after 2 seconds
+      if (elapsed > 2000) {
+        if (!bannerShown) bannerShown = true;
+        bannerAlpha = Math.min(1, bannerAlpha + 0.02);
+        bannerScale = Math.min(1, bannerScale + 0.03);
+
+        const bx = canvas.width / 2;
+        const by = canvas.height * 0.45;
+
+        ctx.save();
+        ctx.translate(bx, by);
+        const bounce = 1 + Math.sin(elapsed * 0.003) * 0.04;
+        ctx.scale(bannerScale * bounce, bannerScale * bounce);
+        ctx.globalAlpha = bannerAlpha;
+
+        // Text shadow / glow
+        const fontSize = Math.min(canvas.width * 0.1, 72);
+        ctx.font = `900 italic ${fontSize}px "Pacifico", "Brush Script MT", "Comic Sans MS", cursive`;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+
+        // Outer glow
+        ctx.shadowColor = '#E97132';
+        ctx.shadowBlur = 30;
+        ctx.fillStyle = '#E97132';
+        ctx.fillText('WELL DONE TEAM!', 0, 0);
+
+        // Main text with gradient
+        ctx.shadowBlur = 0;
+        const grad = ctx.createLinearGradient(-200, -30, 200, 30);
+        grad.addColorStop(0, '#FFD700');
+        grad.addColorStop(0.3, '#E97132');
+        grad.addColorStop(0.6, '#FF4444');
+        grad.addColorStop(1, '#FFD700');
+        ctx.fillStyle = grad;
+        ctx.fillText('WELL DONE TEAM!', 0, 0);
+
+        // White inner highlight
+        ctx.globalAlpha = bannerAlpha * 0.4;
+        ctx.fillStyle = '#fff';
+        ctx.fillText('WELL DONE TEAM!', 0, -2);
+
+        ctx.restore();
+      }
+
+      // Keep going for at least 8 seconds, or while particles alive
+      if (elapsed < 8000 || alive) {
+        requestAnimationFrame(frame);
+      } else {
+        // Fade out banner then remove
+        const fadeOut = () => {
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
+          bannerAlpha -= 0.03;
+          if (bannerAlpha > 0) {
+            const bx = canvas.width / 2;
+            const by = canvas.height * 0.45;
+            const fontSize = Math.min(canvas.width * 0.1, 72);
+            ctx.save();
+            ctx.translate(bx, by);
+            ctx.globalAlpha = bannerAlpha;
+            ctx.font = `900 italic ${fontSize}px "Pacifico", "Brush Script MT", "Comic Sans MS", cursive`;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.shadowColor = '#E97132';
+            ctx.shadowBlur = 30;
+            const grad = ctx.createLinearGradient(-200, -30, 200, 30);
+            grad.addColorStop(0, '#FFD700');
+            grad.addColorStop(0.3, '#E97132');
+            grad.addColorStop(0.6, '#FF4444');
+            grad.addColorStop(1, '#FFD700');
+            ctx.fillStyle = grad;
+            ctx.fillText('WELL DONE TEAM!', 0, 0);
+            ctx.restore();
+            requestAnimationFrame(fadeOut);
+          } else {
+            canvas.remove();
+          }
+        };
+        requestAnimationFrame(fadeOut);
+      }
+    }
+
+    // Load Pacifico font for the banner
+    const link = document.createElement('link');
+    link.href = 'https://fonts.googleapis.com/css2?family=Pacifico&display=swap';
+    link.rel = 'stylesheet';
+    document.head.appendChild(link);
+
+    requestAnimationFrame(frame);
   }
 
   slots.forEach(slot => {
