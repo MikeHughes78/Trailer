@@ -556,32 +556,44 @@
         ctx.scale(bannerScale * bounce, bannerScale * bounce);
         ctx.globalAlpha = bannerAlpha;
 
-        // Text shadow / glow
-        const fontSize = Math.min(canvas.width * 0.1, 72);
-        ctx.font = `900 italic ${fontSize}px "Pacifico", "Brush Script MT", "Comic Sans MS", cursive`;
+        const fontSize = Math.min(canvas.width * 0.12, 72);
+        const fontStr = `900 italic ${fontSize}px "Pacifico", "Brush Script MT", "Comic Sans MS", cursive`;
+        ctx.font = fontStr;
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
 
+        // Decide if we need to wrap
+        const fullText = 'WELL DONE TEAM!';
+        const singleWidth = ctx.measureText(fullText).width;
+        const maxWidth = canvas.width * 0.85;
+        const lines = singleWidth > maxWidth ? ['WELL DONE', 'TEAM!'] : [fullText];
+        const lineHeight = fontSize * 1.15;
+        const totalHeight = lines.length * lineHeight;
+        const startY = -(totalHeight / 2) + lineHeight / 2;
+
+        function drawLines(fillStyle, offsetY, shadow) {
+          if (shadow) { ctx.shadowColor = '#E97132'; ctx.shadowBlur = 30; }
+          else { ctx.shadowColor = 'transparent'; ctx.shadowBlur = 0; }
+          ctx.fillStyle = fillStyle;
+          lines.forEach((line, i) => {
+            ctx.fillText(line, 0, startY + i * lineHeight + (offsetY || 0));
+          });
+        }
+
         // Outer glow
-        ctx.shadowColor = '#E97132';
-        ctx.shadowBlur = 30;
-        ctx.fillStyle = '#E97132';
-        ctx.fillText('WELL DONE TEAM!', 0, 0);
+        drawLines('#E97132', 0, true);
 
         // Main text with gradient
-        ctx.shadowBlur = 0;
         const grad = ctx.createLinearGradient(-200, -30, 200, 30);
         grad.addColorStop(0, '#FFD700');
         grad.addColorStop(0.3, '#E97132');
         grad.addColorStop(0.6, '#FF4444');
         grad.addColorStop(1, '#FFD700');
-        ctx.fillStyle = grad;
-        ctx.fillText('WELL DONE TEAM!', 0, 0);
+        drawLines(grad, 0, false);
 
         // White inner highlight
         ctx.globalAlpha = bannerAlpha * 0.4;
-        ctx.fillStyle = '#fff';
-        ctx.fillText('WELL DONE TEAM!', 0, -2);
+        drawLines('#fff', -2, false);
 
         ctx.restore();
       }
@@ -597,13 +609,23 @@
           if (bannerAlpha > 0) {
             const bx = canvas.width / 2;
             const by = canvas.height * 0.45;
-            const fontSize = Math.min(canvas.width * 0.1, 72);
+            const fontSize = Math.min(canvas.width * 0.12, 72);
+            const fontStr = `900 italic ${fontSize}px "Pacifico", "Brush Script MT", "Comic Sans MS", cursive`;
             ctx.save();
             ctx.translate(bx, by);
             ctx.globalAlpha = bannerAlpha;
-            ctx.font = `900 italic ${fontSize}px "Pacifico", "Brush Script MT", "Comic Sans MS", cursive`;
+            ctx.font = fontStr;
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
+
+            const fullText = 'WELL DONE TEAM!';
+            const singleWidth = ctx.measureText(fullText).width;
+            const maxWidth = canvas.width * 0.85;
+            const lines = singleWidth > maxWidth ? ['WELL DONE', 'TEAM!'] : [fullText];
+            const lineHeight = fontSize * 1.15;
+            const totalHeight = lines.length * lineHeight;
+            const startY = -(totalHeight / 2) + lineHeight / 2;
+
             ctx.shadowColor = '#E97132';
             ctx.shadowBlur = 30;
             const grad = ctx.createLinearGradient(-200, -30, 200, 30);
@@ -612,7 +634,9 @@
             grad.addColorStop(0.6, '#FF4444');
             grad.addColorStop(1, '#FFD700');
             ctx.fillStyle = grad;
-            ctx.fillText('WELL DONE TEAM!', 0, 0);
+            lines.forEach((line, i) => {
+              ctx.fillText(line, 0, startY + i * lineHeight);
+            });
             ctx.restore();
             requestAnimationFrame(fadeOut);
           } else {
