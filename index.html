@@ -5,10 +5,13 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>EUBC Trailer Loading Plan — BUCS Regatta 2026</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
 <style>
   :root {
-    --bg: #f4f5f7;
+    --bg: #f0f5f9;
     --surface: #ffffff;
+    --border: #d0d4db;
     --border-light: #e4e7ec;
     --text: #1a1d23;
     --text-muted: #6b7280;
@@ -16,10 +19,14 @@
     --orange: #E97132;
     --black: #1a1d23;
     --dotted: #ccc;
-    --eubc-accent: #156082;
-    --sr-accent: #A02B93;
+    --baby-blue: #6bb7e0;
+    --baby-blue-light: #d6ecf7;
+    --baby-blue-dark: #3a8dba;
     --btn-done: #196B24;
     --btn-done-bg: rgba(25,107,36,0.08);
+    --safety-red: #d32f2f;
+    --safety-bg: #fff3f3;
+    --safety-border: #f5c6c6;
   }
 
   * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -32,16 +39,93 @@
     padding: 20px 12px 48px;
   }
 
-  .header { text-align: center; margin-bottom: 18px; }
+  /* ── Header with baby blue accent ── */
+  .header {
+    text-align: center;
+    margin-bottom: 18px;
+    position: relative;
+  }
+  .header::before {
+    content: '';
+    position: absolute;
+    top: -20px; left: 50%;
+    transform: translateX(-50%);
+    width: 60px; height: 4px;
+    background: var(--baby-blue);
+    border-radius: 2px;
+  }
   .header h1 {
     font-size: 1.35rem; font-weight: 700;
     letter-spacing: -0.02em; color: var(--black); margin-bottom: 2px;
   }
+  .header h1 .blue { color: var(--baby-blue-dark); }
   .header p { color: var(--text-muted); font-size: 0.82rem; }
+
+  /* ── Safety banner ── */
+  .safety-banner {
+    max-width: 640px;
+    margin: 28px auto 0;
+    background: var(--safety-bg);
+    border: 2px solid var(--safety-border);
+    border-left: 6px solid var(--safety-red);
+    border-radius: 8px;
+    padding: 14px 16px;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    animation: pulse-border 2s ease-in-out infinite alternate;
+  }
+  @keyframes pulse-border {
+    0% { border-left-color: var(--safety-red); box-shadow: 0 0 0 0 rgba(211,47,47,0); }
+    100% { border-left-color: #b71c1c; box-shadow: 0 0 12px 2px rgba(211,47,47,0.15); }
+  }
+  .safety-icon {
+    flex-shrink: 0;
+    width: 40px; height: 40px;
+    background: var(--safety-red);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    color: #fff;
+    font-size: 22px;
+    font-weight: 900;
+    animation: wobble 1.5s ease-in-out infinite;
+  }
+  @keyframes wobble {
+    0%, 100% { transform: rotate(0deg); }
+    15% { transform: rotate(-12deg); }
+    30% { transform: rotate(10deg); }
+    45% { transform: rotate(-6deg); }
+    60% { transform: rotate(4deg); }
+    75% { transform: rotate(0deg); }
+  }
+  .safety-text {
+    flex: 1;
+  }
+  .safety-text .label {
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--safety-red);
+    margin-bottom: 4px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .safety-text .label .stripe {
+    flex: 1; height: 2px;
+    background: repeating-linear-gradient(90deg, var(--safety-red) 0, var(--safety-red) 6px, transparent 6px, transparent 12px);
+  }
+  .safety-text p {
+    font-size: 0.88rem;
+    font-weight: 700;
+    color: #7f1d1d;
+    line-height: 1.4;
+  }
 
   /* ── Progress ── */
   .progress-bar {
-    max-width: 600px; margin: 0 auto 24px;
+    max-width: 640px; margin: 0 auto 24px;
     background: var(--surface); border-radius: 8px;
     padding: 10px 14px; border: 1px solid var(--border-light);
   }
@@ -55,7 +139,7 @@
   }
   .progress-fill {
     height: 100%; border-radius: 3px; transition: width 0.4s ease; width: 0%;
-    background: linear-gradient(90deg, var(--eubc-accent), var(--btn-done));
+    background: linear-gradient(90deg, var(--baby-blue), var(--btn-done));
   }
 
   /* ── Layout ── */
@@ -70,22 +154,13 @@
     font-size: 0.82rem; margin-top: 8px;
   }
 
-  /* ═══════════════════════════════════════════
-     EUBC TRAILER
-     - Top row sits ABOVE the frame
-     - Orange thin uprights on left + right (rack 2 → bottom)
-     - One thick black centre vertical
-     - Thick black horizontal crossarms
-     - Dotted grey inner guides between slot pairs
-     ═══════════════════════════════════════════ */
-
-  .eubc-diagram {
+  /* ═══ EUBC TRAILER ═══ */
+  .eubc-diagram, .sr-diagram {
     position: relative;
     background: var(--surface);
     border-radius: 2px;
   }
 
-  /* Top row — sits above the frame, just a bottom border */
   .eubc-top-row {
     display: grid;
     grid-template-columns: 1fr 1fr 1fr 1fr;
@@ -93,31 +168,24 @@
     padding: 6px 4px 8px;
   }
 
-  /* Main frame area */
   .eubc-frame {
     position: relative;
-    /* Orange border left + right */
     border-left: 2px solid var(--orange);
     border-right: 2px solid var(--orange);
   }
 
-  /* Thick black centre vertical */
   .eubc-frame .centre-v {
     position: absolute;
     left: 50%; top: 0; bottom: 0;
-    width: 3px;
-    background: var(--black);
+    width: 3px; background: var(--black);
     transform: translateX(-50%);
     z-index: 2;
   }
 
-  /* Dotted inner guides at 25% and 75% */
   .eubc-frame .guide-l,
   .eubc-frame .guide-r {
-    position: absolute;
-    top: 0; bottom: 0;
-    width: 0;
-    border-left: 1px dotted var(--dotted);
+    position: absolute; top: 0; bottom: 0;
+    width: 0; border-left: 1px dotted var(--dotted);
     z-index: 1;
   }
   .eubc-frame .guide-l { left: 25%; }
@@ -127,25 +195,10 @@
     display: grid;
     grid-template-columns: 1fr 1fr 1fr 1fr;
     border-bottom: 3px solid var(--black);
-    position: relative;
-    z-index: 3;
+    position: relative; z-index: 3;
   }
 
-
-  /* ═══════════════════════════════════════════
-     SR TRAILER
-     - Top row sits ABOVE the frame
-     - No orange — all black
-     - Two thick black vertical dividers
-     - Thick black horizontal crossarms
-     ═══════════════════════════════════════════ */
-
-  .sr-diagram {
-    position: relative;
-    background: var(--surface);
-    border-radius: 2px;
-  }
-
+  /* ═══ SR TRAILER ═══ */
   .sr-top-row {
     display: grid;
     grid-template-columns: 1fr 1fr 1fr;
@@ -153,17 +206,12 @@
     padding: 6px 4px 8px;
   }
 
-  .sr-frame {
-    position: relative;
-  }
+  .sr-frame { position: relative; }
 
-  /* Two thick black verticals at 1/3 and 2/3 */
   .sr-frame .div-1,
   .sr-frame .div-2 {
-    position: absolute;
-    top: 0; bottom: 0;
-    width: 3px;
-    background: var(--black);
+    position: absolute; top: 0; bottom: 0;
+    width: 3px; background: var(--black);
     transform: translateX(-50%);
     z-index: 2;
   }
@@ -174,15 +222,23 @@
     display: grid;
     grid-template-columns: 1fr 1fr 1fr;
     border-bottom: 3px solid var(--black);
-    position: relative;
-    z-index: 3;
+    position: relative; z-index: 3;
   }
 
+  /* ── Split rack: two items stacked in one grid cell ── */
+  .split-cell {
+    display: flex; flex-direction: column;
+    gap: 0;
+  }
+  .split-cell .boat-slot {
+    min-height: 28px;
+    padding: 4px 6px;
+  }
+  .split-cell .boat-slot:first-child {
+    border-bottom: 1px dashed var(--border-light);
+  }
 
-  /* ═══════════════════════════════════════════
-     BOAT SLOTS (shared)
-     ═══════════════════════════════════════════ */
-
+  /* ═══ BOAT SLOTS ═══ */
   .boat-slot {
     display: flex; align-items: center; justify-content: center;
     gap: 5px;
@@ -198,12 +254,9 @@
 
   .boat-name {
     font-family: 'DM Sans', sans-serif;
-    font-size: 0.85rem;
-    font-weight: 700;
-    color: var(--text);
-    transition: all 0.3s ease;
-    line-height: 1.3;
-    word-break: break-word;
+    font-size: 0.85rem; font-weight: 700;
+    color: var(--text); transition: all 0.3s ease;
+    line-height: 1.3; word-break: break-word;
   }
   .boat-slot.loaded .boat-name {
     color: var(--text-loaded);
@@ -228,10 +281,67 @@
     border-color: var(--btn-done); background: var(--btn-done); color: #fff;
   }
 
-  /* Empty slot */
-  .empty-slot {
-    min-height: 52px;
-    padding: 12px 6px;
+  .empty-slot { min-height: 52px; padding: 12px 6px; }
+
+  /* ═══ EQUIPMENT CHECKLIST ═══ */
+  .checklist-section {
+    max-width: 940px;
+    margin: 28px auto 0;
+  }
+  .checklist-section h2 {
+    font-size: 0.82rem; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.06em;
+    color: var(--baby-blue-dark);
+    margin-bottom: 10px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .checklist-section h2::before {
+    content: ''; width: 14px; height: 3px;
+    background: var(--baby-blue); border-radius: 2px;
+  }
+  .checklist-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 12px;
+  }
+  .checklist-card {
+    background: var(--surface);
+    border: 1px solid var(--border-light);
+    border-radius: 8px;
+    padding: 10px 12px;
+    border-top: 3px solid var(--baby-blue);
+  }
+  .checklist-card h3 {
+    font-size: 0.7rem; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.06em;
+    color: var(--baby-blue-dark);
+    margin-bottom: 6px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid var(--border-light);
+  }
+  .checklist-card .item {
+    display: flex; align-items: center; gap: 6px;
+    padding: 5px 2px;
+    cursor: pointer; user-select: none; -webkit-user-select: none;
+    border-radius: 4px;
+    transition: background 0.2s ease;
+  }
+  .checklist-card .item:hover { background: rgba(0,0,0,0.02); }
+  .checklist-card .item .item-name {
+    font-size: 0.8rem; font-weight: 600; color: var(--text);
+    transition: all 0.3s ease; flex: 1;
+  }
+  .checklist-card .item.loaded .item-name {
+    color: var(--text-loaded);
+    text-decoration: line-through;
+    font-weight: 400;
+  }
+  .checklist-card .item .load-btn {
+    width: 18px; height: 18px; min-width: 18px;
+    font-size: 10px;
+  }
+  .checklist-card .item.loaded .load-btn {
+    border-color: var(--btn-done); background: var(--btn-done); color: #fff;
   }
 
   /* ── Reset ── */
@@ -249,50 +359,55 @@
     .trailer-wrap { max-width: 100%; min-width: 0; }
     .boat-name { font-size: 0.78rem; }
     .boat-slot { padding: 10px 4px; min-height: 44px; }
+    .checklist-grid { grid-template-columns: 1fr 1fr; }
+  }
+  @media (max-width: 400px) {
+    .checklist-grid { grid-template-columns: 1fr; }
   }
 </style>
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
 </head>
 <body>
 
 <div class="header">
-  <h1>EUBC Trailer Loading Plan</h1>
-  <p>BUCS Regatta 2026 · Tap each shell when loaded</p>
+  <h1><span class="blue">EUBC</span> Trailer Loading Plan</h1>
+  <p>BUCS Regatta 2026 · Tap each item when loaded</p>
 </div>
 
+<!-- ═══ PROGRESS ═══ -->
 <div class="progress-bar">
   <div class="label">
     <span>Loading progress</span>
-    <span><strong id="loadedCount">0</strong> / <span id="totalCount">0</span></span>
+    <span><strong id="loadedCount">0</strong> / <span id="totalCount">53</span></span>
   </div>
   <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
 </div>
 
 <div class="trailers">
 
-  <!-- ═══════ EUBC TRAILER ═══════ -->
+  <!-- ═══════ EUBC TRAILER ═══════
+       Row 2:  EHU175 | EHU290 | EHU291 | EHU292
+       Row 5:  EHU471 | EHU470 | EHU472 | EHU 284
+       Row 8:  EHU 280 | Jim Aitken LS | W USP LS | EHU 283
+       Row 11: EHU 270 | Hugh Edmiston LS | Phil McNaul LS | EHU 271
+       Row 14: Hugh Edmiston SS | Jim Aitken SS | W USP SS | Phil McNaul SS
+  -->
   <div class="trailer-wrap">
     <div class="eubc-diagram">
-
-      <!-- Top row — above the frame -->
       <div class="eubc-top-row">
+        <div class="boat-slot" data-id="ehu175"><button class="load-btn">✓</button><span class="boat-name">EHU175</span></div>
         <div class="boat-slot" data-id="ehu290"><button class="load-btn">✓</button><span class="boat-name">EHU290</span></div>
-        <div class="empty-slot"></div>
         <div class="boat-slot" data-id="ehu291"><button class="load-btn">✓</button><span class="boat-name">EHU291</span></div>
         <div class="boat-slot" data-id="ehu292"><button class="load-btn">✓</button><span class="boat-name">EHU292</span></div>
       </div>
-
-      <!-- Main frame with orange uprights -->
       <div class="eubc-frame">
         <div class="centre-v"></div>
         <div class="guide-l"></div>
         <div class="guide-r"></div>
 
         <div class="eubc-rack">
-          <div class="boat-slot" data-id="ehu490"><button class="load-btn">✓</button><span class="boat-name">EHU 490</span></div>
-          <div class="boat-slot" data-id="ehu480"><button class="load-btn">✓</button><span class="boat-name">EHU 480</span></div>
-          <div class="boat-slot" data-id="calum"><button class="load-btn">✓</button><span class="boat-name">Calum</span></div>
+          <div class="boat-slot" data-id="ehu471"><button class="load-btn">✓</button><span class="boat-name">EHU471</span></div>
+          <div class="boat-slot" data-id="ehu470"><button class="load-btn">✓</button><span class="boat-name">EHU470</span></div>
+          <div class="boat-slot" data-id="ehu472"><button class="load-btn">✓</button><span class="boat-name">EHU472</span></div>
           <div class="boat-slot" data-id="ehu284"><button class="load-btn">✓</button><span class="boat-name">EHU 284</span></div>
         </div>
 
@@ -322,45 +437,107 @@
     <div class="trailer-caption">EUBC trailer</div>
   </div>
 
-  <!-- ═══════ SR TRAILER ═══════ -->
+  <!-- ═══════ SR TRAILER ═══════
+       Row 2:  Plank | Matthews | EHU193
+       Row 5:  Ronan | Callum | EHU490
+       Row 8:  EHU480 | KG II LS | Sarju
+       Row 11: EHU171 + EHU170 (split) | KG II SS | EHU173 + EHU174 (split)
+  -->
   <div class="trailer-wrap">
     <div class="sr-diagram">
-
-      <!-- Top row — above the frame -->
       <div class="sr-top-row">
         <div class="boat-slot" data-id="plank"><button class="load-btn">✓</button><span class="boat-name">Plank</span></div>
         <div class="boat-slot" data-id="matthews"><button class="load-btn">✓</button><span class="boat-name">Matthews</span></div>
-        <div class="boat-slot" data-id="thompson-ehu193"><button class="load-btn">✓</button><span class="boat-name">Thompson & EHU 193</span></div>
+        <div class="boat-slot" data-id="ehu193"><button class="load-btn">✓</button><span class="boat-name">EHU193</span></div>
       </div>
-
-      <!-- Main frame — all black, no orange -->
       <div class="sr-frame">
         <div class="div-1"></div>
         <div class="div-2"></div>
 
         <div class="sr-rack">
           <div class="boat-slot" data-id="ronan"><button class="load-btn">✓</button><span class="boat-name">Ronan</span></div>
-          <div class="boat-slot" data-id="ehu472"><button class="load-btn">✓</button><span class="boat-name">EHU 472</span></div>
-          <div class="boat-slot" data-id="ehu470"><button class="load-btn">✓</button><span class="boat-name">EHU470</span></div>
+          <div class="boat-slot" data-id="callum"><button class="load-btn">✓</button><span class="boat-name">Callum</span></div>
+          <div class="boat-slot" data-id="ehu490"><button class="load-btn">✓</button><span class="boat-name">EHU490</span></div>
         </div>
 
         <div class="sr-rack">
-          <div class="boat-slot" data-id="ehu471"><button class="load-btn">✓</button><span class="boat-name">EHU 471</span></div>
+          <div class="boat-slot" data-id="ehu480"><button class="load-btn">✓</button><span class="boat-name">EHU480</span></div>
           <div class="boat-slot" data-id="kg-ii-ls"><button class="load-btn">✓</button><span class="boat-name">KG II LS</span></div>
           <div class="boat-slot" data-id="sarju"><button class="load-btn">✓</button><span class="boat-name">Sarju</span></div>
         </div>
 
         <div class="sr-rack">
-          <div class="boat-slot" data-id="ehu171-170"><button class="load-btn">✓</button><span class="boat-name">EHU 171 & 170</span></div>
+          <div class="split-cell">
+            <div class="boat-slot" data-id="ehu171"><button class="load-btn">✓</button><span class="boat-name">EHU 171</span></div>
+            <div class="boat-slot" data-id="ehu170"><button class="load-btn">✓</button><span class="boat-name">EHU 170</span></div>
+          </div>
           <div class="boat-slot" data-id="kg-ii-ss"><button class="load-btn">✓</button><span class="boat-name">KG II SS</span></div>
-          <div class="boat-slot" data-id="ehu173-174"><button class="load-btn">✓</button><span class="boat-name">EHU 173 & 174</span></div>
+          <div class="split-cell">
+            <div class="boat-slot" data-id="ehu173"><button class="load-btn">✓</button><span class="boat-name">EHU 173</span></div>
+            <div class="boat-slot" data-id="ehu174"><button class="load-btn">✓</button><span class="boat-name">EHU 174</span></div>
+          </div>
         </div>
 
       </div>
     </div>
-    <div class="trailer-caption">SR trailer</div>
+    <div class="trailer-caption">Scottish Rowing trailer</div>
   </div>
 
+</div>
+
+<!-- ═══ EQUIPMENT CHECKLIST ═══ -->
+<div class="checklist-section">
+  <h2>Oars &amp; Equipment Checklist</h2>
+  <div class="checklist-grid">
+
+    <div class="checklist-card">
+      <h3>Sweep Oars</h3>
+      <div class="item" data-id="oar-mens-one-blue"><button class="load-btn">✓</button><span class="item-name">Men's One Blue</span></div>
+      <div class="item" data-id="oar-mens-two-blue"><button class="load-btn">✓</button><span class="item-name">Men's Two Blue</span></div>
+      <div class="item" data-id="oar-womens-yellowpink"><button class="load-btn">✓</button><span class="item-name">Women's Yellow/Pink (plain edge)</span></div>
+      <div class="item" data-id="oar-womens-one-yellow"><button class="load-btn">✓</button><span class="item-name">Women's One Yellow (plain edge)</span></div>
+      <div class="item" data-id="oar-fat2s"><button class="load-btn">✓</button><span class="item-name">Fat2s</span></div>
+    </div>
+
+    <div class="checklist-card">
+      <h3>Sculling Oars</h3>
+      <div class="item" data-id="scull-croker-arrows"><button class="load-btn">✓</button><span class="item-name">Croker Arrows (four sets)</span></div>
+      <div class="item" data-id="scull-fat2-skinny"><button class="load-btn">✓</button><span class="item-name">Fat2 Skinny (six sets)</span></div>
+      <div class="item" data-id="scull-fat2-canal"><button class="load-btn">✓</button><span class="item-name">Fat2 canal (three sets)</span></div>
+      <div class="item" data-id="scull-canal"><button class="load-btn">✓</button><span class="item-name">Canal sculls</span></div>
+      <div class="item" data-id="scull-red-yellow"><button class="load-btn">✓</button><span class="item-name">Red/Yellow (all sets)</span></div>
+      <div class="item" data-id="scull-blue-red"><button class="load-btn">✓</button><span class="item-name">Blue/Red</span></div>
+    </div>
+
+    <div class="checklist-card">
+      <h3>Coxes Checklist</h3>
+      <div class="item" data-id="cox-lifejackets"><button class="load-btn">✓</button><span class="item-name">Lifejackets</span></div>
+      <div class="item" data-id="cox-coxboxes"><button class="load-btn">✓</button><span class="item-name">Coxboxes (and chargers)</span></div>
+      <div class="item" data-id="cox-chargers"><button class="load-btn">✓</button><span class="item-name">Chargers</span></div>
+      <div class="item" data-id="cox-weights"><button class="load-btn">✓</button><span class="item-name">Weights</span></div>
+    </div>
+
+    <div class="checklist-card">
+      <h3>General Items</h3>
+      <div class="item" data-id="gen-speedcoaches"><button class="load-btn">✓</button><span class="item-name">Speedcoaches (and chargers)</span></div>
+      <div class="item" data-id="gen-trestles"><button class="load-btn">✓</button><span class="item-name">Trestles</span></div>
+      <div class="item" data-id="gen-low-stands"><button class="load-btn">✓</button><span class="item-name">Low stands</span></div>
+      <div class="item" data-id="gen-spare-parts"><button class="load-btn">✓</button><span class="item-name">Spare parts boxes</span></div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ═══ SAFETY BANNER ═══ -->
+<div class="safety-banner">
+  <div class="safety-icon">⚠</div>
+  <div class="safety-text">
+    <div class="label">
+      <span>Pre-Loading Safety Check</span>
+      <span class="stripe"></span>
+    </div>
+    <p>CHECK HEEL RESTRAINTS, HATCH COVERS, BOW BALLS, SHOE SCREWS BEFORE LOADING</p>
+  </div>
 </div>
 
 <button class="reset-btn" id="resetBtn">Reset all</button>
@@ -378,21 +555,20 @@
     appId: "1:600281786846:web:8db32790d80e4ef6f6954f"
   };
   firebase.initializeApp(firebaseConfig);
-  const db = firebase.database().ref('trailer-state');
+  const db = firebase.database().ref('trailer-state-v2');
 
-  const slots = document.querySelectorAll('.boat-slot');
-  document.getElementById('totalCount').textContent = slots.length;
-  const slotMap = {};
-  slots.forEach(slot => { slotMap[slot.dataset.id] = slot; });
+  // All tappable items (boats + equipment)
+  const allItems = document.querySelectorAll('.boat-slot, .checklist-card .item');
+  const totalCount = allItems.length;
+  document.getElementById('totalCount').textContent = totalCount;
 
   let previousLoaded = 0;
-  let ignoreNextFirebase = false;
 
   function refresh() {
-    const n = document.querySelectorAll('.boat-slot.loaded').length;
+    const n = document.querySelectorAll('.boat-slot.loaded, .checklist-card .item.loaded').length;
     document.getElementById('loadedCount').textContent = n;
-    document.getElementById('progressFill').style.width = ((n / slots.length) * 100) + '%';
-    if (n === slots.length && previousLoaded < slots.length) {
+    document.getElementById('progressFill').style.width = ((n / totalCount) * 100) + '%';
+    if (n === totalCount && previousLoaded < totalCount) {
       celebrate();
     }
     previousLoaded = n;
@@ -410,7 +586,7 @@
     canvas.height = window.innerHeight;
     const ctx = canvas.getContext('2d');
 
-    const colours = ['#E97132','#156082','#196B24','#A02B93','#0F9ED5','#4EA72E','#FFD700','#FF4444','#FF69B4','#00CED1'];
+    const colours = ['#6bb7e0','#3a8dba','#E97132','#196B24','#A02B93','#0F9ED5','#4EA72E','#FFD700','#FF4444','#FF69B4','#00CED1'];
     const particles = [];
     const fireworks = [];
     let startTime = performance.now();
@@ -465,7 +641,6 @@
       ctx.fill();
     }
 
-    // Pre-schedule fireworks
     const fwTimes = [200, 600, 1100, 1700, 2400, 3000, 3500, 4200, 4800, 5500, 6200, 6800];
     let fwIndex = 0;
 
@@ -473,7 +648,6 @@
       const elapsed = now - startTime;
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-      // Spawn confetti waves
       if (waveCount < totalWaves && elapsed > nextWave) {
         const positions = [
           {x: Math.random()*canvas.width, y: canvas.height*0.2 + Math.random()*canvas.height*0.3},
@@ -485,7 +659,6 @@
         waveCount++;
       }
 
-      // Spawn fireworks on schedule
       while (fwIndex < fwTimes.length && elapsed > fwTimes[fwIndex]) {
         spawnFirework(
           canvas.width * (0.15 + Math.random() * 0.7),
@@ -494,12 +667,10 @@
         fwIndex++;
       }
 
-      // Update & draw fireworks
       fireworks.forEach(fw => {
         if (!fw.exploded) {
           fw.y -= fw.speed;
           fw.trail.push({x: fw.x, y: fw.y, life: 1});
-          // Draw trail
           fw.trail.forEach(t => {
             t.life -= 0.04;
             if (t.life > 0) {
@@ -511,7 +682,6 @@
           ctx.globalAlpha = 1;
           ctx.fillStyle = '#fff';
           ctx.fillRect(fw.x - 2, fw.y - 2, 4, 4);
-
           if (fw.y <= fw.targetY) {
             fw.exploded = true;
             spawnBurst(fw.x, fw.y, 80, 8);
@@ -519,103 +689,79 @@
         }
       });
 
-      // Update & draw particles
       let alive = false;
       particles.forEach(p => {
         if (p.life <= 0) return;
         alive = true;
-        p.x += p.vx;
-        p.y += p.vy;
-        p.vy += 0.1;
-        p.vx *= 0.99;
+        p.x += p.vx; p.y += p.vy;
+        p.vy += 0.1; p.vx *= 0.99;
         p.life -= p.decay;
         p.rotation += p.rotSpeed;
         p.wobble += p.wobbleSpeed;
         p.x += Math.sin(p.wobble) * 0.5;
-
         ctx.save();
         ctx.translate(p.x, p.y);
         ctx.rotate(p.rotation * Math.PI / 180);
         ctx.globalAlpha = Math.max(0, p.life);
         ctx.fillStyle = p.colour;
-
         if (p.shape === 'rect') {
           ctx.fillRect(-p.size/2, -p.size/3, p.size, p.size * 0.5);
         } else if (p.shape === 'circle') {
-          ctx.beginPath();
-          ctx.arc(0, 0, p.size/2, 0, Math.PI * 2);
-          ctx.fill();
+          ctx.beginPath(); ctx.arc(0, 0, p.size/2, 0, Math.PI * 2); ctx.fill();
         } else if (p.shape === 'star') {
           drawStar(ctx, p.size/2);
         } else {
-          // Streamer — long thin ribbon
           ctx.fillRect(-1, -p.size, 2, p.size * 2);
         }
         ctx.restore();
       });
 
-      // Banner after 2 seconds
       if (elapsed > 2000) {
         if (!bannerShown) bannerShown = true;
         bannerAlpha = Math.min(1, bannerAlpha + 0.02);
         bannerScale = Math.min(1, bannerScale + 0.03);
-
         const bx = canvas.width / 2;
         const by = canvas.height * 0.45;
-
         ctx.save();
         ctx.translate(bx, by);
         const bounce = 1 + Math.sin(elapsed * 0.003) * 0.04;
         ctx.scale(bannerScale * bounce, bannerScale * bounce);
         ctx.globalAlpha = bannerAlpha;
-
         const fontSize = Math.min(canvas.width * 0.12, 72);
         const fontStr = `900 italic ${fontSize}px "Pacifico", "Brush Script MT", "Comic Sans MS", cursive`;
         ctx.font = fontStr;
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
-
-        // Decide if we need to wrap
         const fullText = 'WELL DONE TEAM!';
         const singleWidth = ctx.measureText(fullText).width;
         const maxWidth = canvas.width * 0.85;
         const lines = singleWidth > maxWidth ? ['WELL DONE', 'TEAM!'] : [fullText];
         const lineHeight = fontSize * 1.15;
-        const totalHeight = lines.length * lineHeight;
-        const startY = -(totalHeight / 2) + lineHeight / 2;
-
+        const totalH = lines.length * lineHeight;
+        const startY = -(totalH / 2) + lineHeight / 2;
         function drawLines(fillStyle, offsetY, shadow) {
-          if (shadow) { ctx.shadowColor = '#E97132'; ctx.shadowBlur = 30; }
+          if (shadow) { ctx.shadowColor = '#6bb7e0'; ctx.shadowBlur = 30; }
           else { ctx.shadowColor = 'transparent'; ctx.shadowBlur = 0; }
           ctx.fillStyle = fillStyle;
           lines.forEach((line, i) => {
             ctx.fillText(line, 0, startY + i * lineHeight + (offsetY || 0));
           });
         }
-
-        // Outer glow
-        drawLines('#E97132', 0, true);
-
-        // Main text with gradient
+        drawLines('#3a8dba', 0, true);
         const grad = ctx.createLinearGradient(-200, -30, 200, 30);
-        grad.addColorStop(0, '#FFD700');
-        grad.addColorStop(0.3, '#E97132');
-        grad.addColorStop(0.6, '#FF4444');
-        grad.addColorStop(1, '#FFD700');
+        grad.addColorStop(0, '#6bb7e0');
+        grad.addColorStop(0.3, '#FFD700');
+        grad.addColorStop(0.6, '#E97132');
+        grad.addColorStop(1, '#6bb7e0');
         drawLines(grad, 0, false);
-
-        // White inner highlight
         ctx.globalAlpha = bannerAlpha * 0.4;
         drawLines('#fff', -2, false);
-
         ctx.restore();
       }
 
-      // Keep going for at least 8 seconds, or while particles alive
       if (elapsed < 8000 || alive) {
         requestAnimationFrame(frame);
       } else {
-        // Fade out banner then remove
         const fadeOut = () => {
           ctx.clearRect(0, 0, canvas.width, canvas.height);
           bannerAlpha -= 0.03;
@@ -623,29 +769,24 @@
             const bx = canvas.width / 2;
             const by = canvas.height * 0.45;
             const fontSize = Math.min(canvas.width * 0.12, 72);
-            const fontStr = `900 italic ${fontSize}px "Pacifico", "Brush Script MT", "Comic Sans MS", cursive`;
             ctx.save();
             ctx.translate(bx, by);
             ctx.globalAlpha = bannerAlpha;
-            ctx.font = fontStr;
-            ctx.textAlign = 'center';
-            ctx.textBaseline = 'middle';
-
+            ctx.font = `900 italic ${fontSize}px "Pacifico", "Brush Script MT", "Comic Sans MS", cursive`;
+            ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
             const fullText = 'WELL DONE TEAM!';
             const singleWidth = ctx.measureText(fullText).width;
             const maxWidth = canvas.width * 0.85;
             const lines = singleWidth > maxWidth ? ['WELL DONE', 'TEAM!'] : [fullText];
             const lineHeight = fontSize * 1.15;
-            const totalHeight = lines.length * lineHeight;
-            const startY = -(totalHeight / 2) + lineHeight / 2;
-
-            ctx.shadowColor = '#E97132';
-            ctx.shadowBlur = 30;
+            const totalH = lines.length * lineHeight;
+            const startY = -(totalH / 2) + lineHeight / 2;
+            ctx.shadowColor = '#6bb7e0'; ctx.shadowBlur = 30;
             const grad = ctx.createLinearGradient(-200, -30, 200, 30);
-            grad.addColorStop(0, '#FFD700');
-            grad.addColorStop(0.3, '#E97132');
-            grad.addColorStop(0.6, '#FF4444');
-            grad.addColorStop(1, '#FFD700');
+            grad.addColorStop(0, '#6bb7e0');
+            grad.addColorStop(0.3, '#FFD700');
+            grad.addColorStop(0.6, '#E97132');
+            grad.addColorStop(1, '#6bb7e0');
             ctx.fillStyle = grad;
             lines.forEach((line, i) => {
               ctx.fillText(line, 0, startY + i * lineHeight);
@@ -660,38 +801,34 @@
       }
     }
 
-    // Load Pacifico font for the banner
     const link = document.createElement('link');
     link.href = 'https://fonts.googleapis.com/css2?family=Pacifico&display=swap';
     link.rel = 'stylesheet';
     document.head.appendChild(link);
-
     requestAnimationFrame(frame);
   }
 
   // ── Listen for real-time updates from Firebase ──
   db.on('value', function(snapshot) {
     const state = snapshot.val() || {};
-    slots.forEach(slot => {
-      const id = slot.dataset.id;
+    allItems.forEach(el => {
+      const id = el.dataset.id;
       if (state[id]) {
-        slot.classList.add('loaded');
+        el.classList.add('loaded');
       } else {
-        slot.classList.remove('loaded');
+        el.classList.remove('loaded');
       }
     });
     refresh();
   });
 
-  // ── Click handler — toggle and push to Firebase ──
-  slots.forEach(slot => {
-    slot.addEventListener('click', function() {
-      const id = slot.dataset.id;
-      const isLoaded = !slot.classList.contains('loaded');
-      // Optimistic local update
-      slot.classList.toggle('loaded');
+  // ── Click handler ──
+  allItems.forEach(el => {
+    el.addEventListener('click', function() {
+      const id = el.dataset.id;
+      const isLoaded = !el.classList.contains('loaded');
+      el.classList.toggle('loaded');
       refresh();
-      // Push to Firebase
       db.child(id).set(isLoaded ? true : null);
     });
   });
