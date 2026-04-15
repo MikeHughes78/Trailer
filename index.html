@@ -626,10 +626,224 @@
     let startTime = performance.now();
     let nextWave = 0;
     let waveCount = 0;
-    const totalWaves = 8;
+    const totalWaves = 16;
     let bannerShown = false;
     let bannerAlpha = 0;
     let bannerScale = 0;
+
+    // ── 8-BIT VICTORY FANFARE ──
+    function playVictoryFanfare() {
+      const ac = new (window.AudioContext || window.webkitAudioContext)();
+
+      function sq(freq, start, dur, vol) {
+        const o = ac.createOscillator();
+        const g = ac.createGain();
+        o.type = 'square';
+        o.frequency.setValueAtTime(freq, ac.currentTime + start);
+        g.gain.setValueAtTime(vol || 0.08, ac.currentTime + start);
+        g.gain.setValueAtTime(vol || 0.08, ac.currentTime + start + dur - 0.015);
+        g.gain.linearRampToValueAtTime(0, ac.currentTime + start + dur);
+        o.connect(g);
+        g.connect(ac.destination);
+        o.start(ac.currentTime + start);
+        o.stop(ac.currentTime + start + dur);
+      }
+
+      function tri(freq, start, dur, vol) {
+        const o = ac.createOscillator();
+        const g = ac.createGain();
+        o.type = 'triangle';
+        o.frequency.setValueAtTime(freq, ac.currentTime + start);
+        g.gain.setValueAtTime(vol || 0.06, ac.currentTime + start);
+        g.gain.setValueAtTime(vol || 0.06, ac.currentTime + start + dur - 0.015);
+        g.gain.linearRampToValueAtTime(0, ac.currentTime + start + dur);
+        o.connect(g);
+        g.connect(ac.destination);
+        o.start(ac.currentTime + start);
+        o.stop(ac.currentTime + start + dur);
+      }
+
+      // Noise percussion
+      function noise(start, dur) {
+        const buf = ac.createBuffer(1, ac.sampleRate * dur, ac.sampleRate);
+        const data = buf.getChannelData(0);
+        for (let i = 0; i < data.length; i++) data[i] = Math.random() * 2 - 1;
+        const src = ac.createBufferSource();
+        src.buffer = buf;
+        const g = ac.createGain();
+        const filt = ac.createBiquadFilter();
+        filt.type = 'highpass';
+        filt.frequency.value = 5000;
+        src.connect(filt);
+        filt.connect(g);
+        g.connect(ac.destination);
+        g.gain.setValueAtTime(0.04, ac.currentTime + start);
+        g.gain.exponentialRampToValueAtTime(0.001, ac.currentTime + start + dur);
+        src.start(ac.currentTime + start);
+        src.stop(ac.currentTime + start + dur);
+      }
+
+      const bpm = 160;
+      const q = 60 / bpm; // quarter note
+      const e = q / 2;    // eighth
+      const s = q / 4;    // sixteenth
+      const h = q * 2;    // half
+      const w = q * 4;    // whole
+
+      // === SECTION 1: Opening fanfare (0-3s) - quick ascending staccato run ===
+      let t = 0;
+      // Rapid ascending C major arpeggio
+      const run1 = [523, 587, 659, 784, 880, 988, 1047, 1175, 1319, 1568];
+      run1.forEach((f, i) => {
+        sq(f, t + i * s, s * 0.8, 0.07);
+        if (i % 2 === 0) noise(t + i * s, 0.03);
+      });
+      t += run1.length * s;
+
+      // Big triumphant two-hit punch
+      sq(1568, t, e, 0.10); // G6
+      tri(784, t, e, 0.07); // G5 harmony
+      noise(t, 0.05);
+      t += e + s;
+      sq(2093, t, q, 0.12); // C7 - the big note
+      tri(1047, t, q, 0.08); // C6 harmony
+      tri(659, t, q, 0.06);  // E5 harmony
+      noise(t, 0.06);
+      t += q + e;
+
+      // === SECTION 2: Bouncy celebration melody (3-9s) ===
+      const melody2 = [
+        // Phrase 1: bouncy major theme
+        [1047,e],[1319,e],[1568,e],[1319,s],[1047,s],
+        [1175,e],[1319,q],[0,e],
+        [1047,e],[1319,e],[1568,e],[1760,s],[1568,s],
+        [1319,e],[1175,q],[0,e],
+        // Phrase 2: variation with higher peak
+        [1568,e],[1760,e],[2093,e],[1760,s],[1568,s],
+        [1319,e],[1568,q],[0,e],
+        [1568,e],[1319,e],[1175,e],[1047,s],[1175,s],
+        [1319,q+e],[0,e],
+      ];
+      // Bass line
+      const bass2 = [
+        [523,q],[0,e],[523,e],[659,q],[0,e],[659,e],
+        [523,q],[0,e],[523,e],[587,q],[0,e],[587,e],
+        [784,q],[0,e],[784,e],[659,q],[0,e],[659,e],
+        [784,q],[0,e],[784,e],[523,q],[0,e],[523,e],
+      ];
+
+      let tm = t;
+      melody2.forEach(([f, d]) => {
+        if (f > 0) sq(f, tm, d * 0.85, 0.08);
+        tm += d;
+      });
+      let tb = t;
+      bass2.forEach(([f, d]) => {
+        if (f > 0) tri(f, tb, d * 0.85, 0.05);
+        tb += d;
+      });
+      // Percussion pattern
+      for (let i = 0; i < 16; i++) {
+        noise(t + i * q, 0.04);
+        if (i % 2 === 0) noise(t + i * q + e, 0.02);
+      }
+      t = tm;
+
+      // === SECTION 3: Bridge / build-up (9-13s) ===
+      const bridge = [
+        [1319,e],[1319,s],[1319,s],[1568,e],[1319,e],
+        [1175,e],[1175,s],[1175,s],[1319,e],[1175,e],
+        [1047,e],[1175,e],[1319,e],[1568,e],
+        [1760,e],[1568,e],[1319,e],[1175,e],
+        // Ascending build
+        [1047,s],[1175,s],[1319,s],[1568,s],
+        [1760,s],[1976,s],[2093,s],[2349,s],
+      ];
+      const bridgeBass = [
+        [880,q],[0,e],[880,e],[784,q],[0,e],[784,e],
+        [659,q],[0,e],[659,e],[587,q],[0,e],[587,e],
+        [523,e],[587,e],[659,e],[784,e],
+      ];
+      let tbr = t;
+      bridge.forEach(([f, d]) => {
+        if (f > 0) sq(f, tbr, d * 0.85, 0.08);
+        tbr += d;
+      });
+      let tbb = t;
+      bridgeBass.forEach(([f, d]) => {
+        if (f > 0) tri(f, tbb, d * 0.85, 0.06);
+        tbb += d;
+      });
+      for (let i = 0; i < 10; i++) {
+        noise(t + i * q, 0.04);
+      }
+      t = tbr;
+
+      // === SECTION 4: Grand finale (13-17s) ===
+      // Triumphant repeated motif
+      const finale = [
+        [2093,e],[0,s],[2093,e],[1568,e],[1319,e],[1568,q],
+        [0,e],
+        [2093,e],[0,s],[2093,e],[2349,e],[2093,e],[1568,q],
+        [0,e],
+        [2093,e],[2349,e],[2637,q+e],
+      ];
+      const finaleBass = [
+        [523,q],[659,q],[784,q],[523,q],
+        [523,q],[659,q],[784,q],[523,q],
+        [523,q],[659,q],[784,h],
+      ];
+      let tf = t;
+      finale.forEach(([f, d]) => {
+        if (f > 0) sq(f, tf, d * 0.85, 0.10);
+        tf += d;
+      });
+      let tfb = t;
+      finaleBass.forEach(([f, d]) => {
+        if (f > 0) tri(f, tfb, d * 0.85, 0.07);
+        tfb += d;
+      });
+      for (let i = 0; i < 8; i++) {
+        noise(t + i * q, 0.05);
+        noise(t + i * q + e, 0.03);
+      }
+      t = tf;
+
+      // === ENDING: Big held chord that fades (17-19s) ===
+      function held(freq, start, dur, vol) {
+        const o = ac.createOscillator();
+        const g = ac.createGain();
+        o.type = 'square';
+        o.frequency.setValueAtTime(freq, ac.currentTime + start);
+        g.gain.setValueAtTime(vol, ac.currentTime + start);
+        g.gain.exponentialRampToValueAtTime(0.001, ac.currentTime + start + dur);
+        o.connect(g);
+        g.connect(ac.destination);
+        o.start(ac.currentTime + start);
+        o.stop(ac.currentTime + start + dur);
+      }
+      // C major chord, big and wide
+      held(1047, t, 2.5, 0.09); // C6
+      held(1319, t, 2.5, 0.07); // E6
+      held(1568, t, 2.5, 0.07); // G6
+      held(2093, t, 2.5, 0.08); // C7
+      held(523, t, 2.5, 0.06);  // C5
+      // Triangle sub
+      const o = ac.createOscillator();
+      const g = ac.createGain();
+      o.type = 'triangle';
+      o.frequency.setValueAtTime(262, ac.currentTime + t);
+      g.gain.setValueAtTime(0.07, ac.currentTime + t);
+      g.gain.exponentialRampToValueAtTime(0.001, ac.currentTime + t + 3);
+      o.connect(g); g.connect(ac.destination);
+      o.start(ac.currentTime + t);
+      o.stop(ac.currentTime + t + 3);
+
+      noise(t, 0.1);
+    }
+
+    // Play the fanfare immediately
+    playVictoryFanfare();
 
     function spawnBurst(ox, oy, count, power) {
       for (let i = 0; i < count; i++) {
@@ -675,7 +889,7 @@
       ctx.fill();
     }
 
-    const fwTimes = [200, 600, 1100, 1700, 2400, 3000, 3500, 4200, 4800, 5500, 6200, 6800];
+    const fwTimes = [200,600,1100,1700,2400,3000,3500,4200,4800,5500,6200,6800,7500,8200,9000,9800,10500,11300,12000,12800,13500,14200,15000,16000,17000];
     let fwIndex = 0;
 
     function frame(now) {
@@ -793,7 +1007,7 @@
         ctx.restore();
       }
 
-      if (elapsed < 8000 || alive) {
+      if (elapsed < 18000 || alive) {
         requestAnimationFrame(frame);
       } else {
         const fadeOut = () => {
