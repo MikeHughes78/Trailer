@@ -251,6 +251,8 @@
     .boat-slot { padding: 10px 4px; min-height: 44px; }
   }
 </style>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
 </head>
 <body>
 
@@ -365,15 +367,26 @@
 
 <script>
 (function() {
-  const KEY = 'eubc-trailer-2026-v5';
-  let state = {};
-  try { const s = localStorage.getItem(KEY); if (s) state = JSON.parse(s); } catch(e) {}
-  function save() { try { localStorage.setItem(KEY, JSON.stringify(state)); } catch(e) {} }
+  // ── Firebase setup ──
+  const firebaseConfig = {
+    apiKey: "AIzaSyCzmr4npgGLg7IZilxdYNXPqKwiPtMJrs8",
+    authDomain: "trailerplan-a3a9d.firebaseapp.com",
+    databaseURL: "https://trailerplan-a3a9d-default-rtdb.europe-west1.firebasedatabase.app",
+    projectId: "trailerplan-a3a9d",
+    storageBucket: "trailerplan-a3a9d.firebasestorage.app",
+    messagingSenderId: "600281786846",
+    appId: "1:600281786846:web:8db32790d80e4ef6f6954f"
+  };
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.database().ref('trailer-state');
 
   const slots = document.querySelectorAll('.boat-slot');
   document.getElementById('totalCount').textContent = slots.length;
+  const slotMap = {};
+  slots.forEach(slot => { slotMap[slot.dataset.id] = slot; });
 
   let previousLoaded = 0;
+  let ignoreNextFirebase = false;
 
   function refresh() {
     const n = document.querySelectorAll('.boat-slot.loaded').length;
@@ -656,24 +669,36 @@
     requestAnimationFrame(frame);
   }
 
+  // ── Listen for real-time updates from Firebase ──
+  db.on('value', function(snapshot) {
+    const state = snapshot.val() || {};
+    slots.forEach(slot => {
+      const id = slot.dataset.id;
+      if (state[id]) {
+        slot.classList.add('loaded');
+      } else {
+        slot.classList.remove('loaded');
+      }
+    });
+    refresh();
+  });
+
+  // ── Click handler — toggle and push to Firebase ──
   slots.forEach(slot => {
-    const id = slot.dataset.id;
-    if (state[id]) slot.classList.add('loaded');
     slot.addEventListener('click', function() {
+      const id = slot.dataset.id;
+      const isLoaded = !slot.classList.contains('loaded');
+      // Optimistic local update
       slot.classList.toggle('loaded');
-      state[id] = slot.classList.contains('loaded');
-      save();
       refresh();
+      // Push to Firebase
+      db.child(id).set(isLoaded ? true : null);
     });
   });
-  refresh();
 
   document.getElementById('resetBtn').addEventListener('click', function() {
     if (!confirm('Reset all loading progress?')) return;
-    slots.forEach(s => s.classList.remove('loaded'));
-    state = {};
-    save();
-    refresh();
+    db.remove();
   });
 })();
 </script>
