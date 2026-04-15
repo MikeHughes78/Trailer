@@ -273,12 +273,46 @@
     flex-shrink: 0; transition: all 0.2s ease;
     color: transparent; font-size: 11px; line-height: 1;
     padding: 0;
+    position: relative;
+    overflow: visible;
   }
   .load-btn:hover {
     border-color: var(--btn-done); background: var(--btn-done-bg);
   }
   .boat-slot.loaded .load-btn {
     border-color: var(--btn-done); background: var(--btn-done); color: #fff;
+  }
+
+  /* Ripple ring animation */
+  .ripple-ring {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%) scale(0);
+    width: 40px; height: 40px;
+    border-radius: 50%;
+    border: 2px solid var(--baby-blue);
+    opacity: 1;
+    pointer-events: none;
+    z-index: 10;
+    animation: ripple-expand 0.5s ease-out forwards;
+  }
+  @keyframes ripple-expand {
+    0% { transform: translate(-50%, -50%) scale(0); opacity: 0.9; }
+    100% { transform: translate(-50%, -50%) scale(2.2); opacity: 0; }
+  }
+
+  /* Mini confetti particle */
+  .mini-confetti {
+    position: absolute;
+    width: 5px; height: 5px;
+    border-radius: 1px;
+    pointer-events: none;
+    z-index: 10;
+    animation: mini-pop 0.6s ease-out forwards;
+  }
+  @keyframes mini-pop {
+    0% { transform: translate(0, 0) scale(1) rotate(0deg); opacity: 1; }
+    100% { transform: translate(var(--mx), var(--my)) scale(0) rotate(var(--mr)); opacity: 0; }
   }
 
   .empty-slot { min-height: 52px; padding: 12px 6px; }
@@ -822,14 +856,114 @@
     refresh();
   });
 
+  // ── Sound engine (Web Audio API) ──
+  let audioCtx = null;
+  function getAudioCtx() {
+    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    return audioCtx;
+  }
+
+  function playTick(isBoat) {
+    const ctx = getAudioCtx();
+    const now = ctx.currentTime;
+    const osc1 = ctx.createOscillator();
+    const osc2 = ctx.createOscillator();
+    const gain = ctx.createGain();
+
+    osc1.connect(gain);
+    osc2.connect(gain);
+    gain.connect(ctx.destination);
+
+    if (isBoat) {
+      // Boat: bright two-note chime (C6 → E6)
+      osc1.type = 'sine';
+      osc1.frequency.setValueAtTime(1047, now);
+      osc1.frequency.setValueAtTime(1319, now + 0.08);
+      osc2.type = 'sine';
+      osc2.frequency.setValueAtTime(1568, now + 0.06);
+      gain.gain.setValueAtTime(0.15, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.25);
+    } else {
+      // Equipment: softer woodblock pop (G5 → B5)
+      osc1.type = 'triangle';
+      osc1.frequency.setValueAtTime(784, now);
+      osc2.type = 'triangle';
+      osc2.frequency.setValueAtTime(988, now + 0.05);
+      gain.gain.setValueAtTime(0.12, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.18);
+    }
+
+    osc1.start(now);
+    osc2.start(now);
+    osc1.stop(now + 0.3);
+    osc2.stop(now + 0.3);
+  }
+
+  function playUntick() {
+    const ctx = getAudioCtx();
+    const now = ctx.currentTime;
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+
+    // Sad descending tone (E5 → C4)
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(659, now);
+    osc.frequency.exponentialRampToValueAtTime(262, now + 0.25);
+    gain.gain.setValueAtTime(0.1, now);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.3);
+
+    osc.start(now);
+    osc.stop(now + 0.35);
+  }
+
+  // ── Visual effects ──
+  const miniColours = ['#6bb7e0','#E97132','#196B24','#FFD700','#A02B93','#FF69B4'];
+
+  function spawnRipple(btn) {
+    const ring = document.createElement('div');
+    ring.className = 'ripple-ring';
+    btn.appendChild(ring);
+    ring.addEventListener('animationend', () => ring.remove());
+  }
+
+  function spawnMiniConfetti(btn) {
+    for (let i = 0; i < 5; i++) {
+      const p = document.createElement('div');
+      p.className = 'mini-confetti';
+      p.style.background = miniColours[Math.floor(Math.random() * miniColours.length)];
+      const angle = (Math.PI * 2 * i) / 5 + (Math.random() - 0.5) * 0.5;
+      const dist = 18 + Math.random() * 14;
+      p.style.setProperty('--mx', Math.cos(angle) * dist + 'px');
+      p.style.setProperty('--my', Math.sin(angle) * dist + 'px');
+      p.style.setProperty('--mr', (Math.random() * 360) + 'deg');
+      p.style.left = '50%';
+      p.style.top = '50%';
+      btn.appendChild(p);
+      p.addEventListener('animationend', () => p.remove());
+    }
+  }
+
   // ── Click handler ──
   allItems.forEach(el => {
     el.addEventListener('click', function() {
       const id = el.dataset.id;
       const isLoaded = !el.classList.contains('loaded');
+      const isBoat = el.classList.contains('boat-slot');
+      const btn = el.querySelector('.load-btn');
+
       el.classList.toggle('loaded');
       refresh();
       db.child(id).set(isLoaded ? true : null);
+
+      if (isLoaded) {
+        playTick(isBoat);
+        spawnRipple(btn);
+        spawnMiniConfetti(btn);
+      } else {
+        playUntick();
+      }
     });
   });
 
