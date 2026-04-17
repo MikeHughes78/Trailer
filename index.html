@@ -2,8 +2,8 @@
 <html lang="en">
 <head>
   <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16.png">
-<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
-<link rel="icon" type="image/png" sizes="48x48" href="/favicon-48.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="48x48" href="/favicon-48.png">
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Meggetland</title>
@@ -27,17 +27,16 @@
       overflow: hidden;
     }
 
-   .hero {
-  height: 100vh;
-  width: 100%;
-  background: url("4+canal.jpg") no-repeat center center / cover;
-  position: relative;
-  display: flex;
-  justify-content: center;
-  align-items: flex-start;
-}
+    .hero {
+      height: 100vh;
+      width: 100%;
+      background: url("4+canal.jpg") no-repeat center center / cover;
+      position: relative;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+    }
 
-    /* Warm heritage overlay */
     .hero::before {
       content: "";
       position: absolute;
@@ -46,13 +45,13 @@
     }
 
     .content {
-  position: absolute;
-  top: 70%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  z-index: 1;
-  text-align: center;
-}
+      position: absolute;
+      top: 70%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 1;
+      text-align: center;
+    }
 
     h1 {
       font-size: clamp(3rem, 9vw, 7rem);
@@ -76,47 +75,45 @@
       text-transform: lowercase;
     }
 
-    /* Bottom link */
-  .footer-links {
-  position: absolute;
-  bottom: 3rem;
-  left: 50%;
-  transform: translateX(-50%);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.8rem;
-  z-index: 1;
+    .footer-links {
+      position: absolute;
+      bottom: 3rem;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.8rem;
+      z-index: 1;
+      opacity: 0;
+      animation: fadeIn 2s ease 1.5s forwards;
+    }
 
-  opacity: 0;
-  animation: fadeIn 2s ease 1.5s forwards;
-}
+    .footer-links a {
+      font-size: 0.75rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: rgba(245, 242, 236, 0.6);
+      text-decoration: none;
+    }
 
-.footer-links a {
-  font-size: 0.75rem;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  color: rgba(245, 242, 236, 0.6);
-  text-decoration: none;
-}
+    .footer-links a::after {
+      content: "";
+      display: block;
+      width: 0;
+      height: 1px;
+      background: rgba(245, 242, 236, 0.6);
+      margin-top: 6px;
+      transition: width 0.3s ease;
+    }
 
-.footer-links a::after {
-  content: "";
-  display: block;
-  width: 0;
-  height: 1px;
-  background: rgba(245, 242, 236, 0.6);
-  margin-top: 6px;
-  transition: width 0.3s ease;
-}
+    .footer-links a:hover {
+      color: rgba(245, 242, 236, 0.9);
+    }
 
-.footer-links a:hover {
-  color: rgba(245, 242, 236, 0.9);
-}
-
-.footer-links a:hover::after {
-  width: 100%;
-}
+    .footer-links a:hover::after {
+      width: 100%;
+    }
 
     @keyframes fadeIn {
       to {
@@ -125,8 +122,11 @@
     }
 
     @media (max-width: 640px) {
-      .footer-link {
-        bottom: 0.5rem;
+      .footer-links {
+        bottom: 1rem;
+      }
+
+      .footer-links a {
         font-size: 0.7rem;
       }
     }
@@ -141,8 +141,10 @@
       <p>check back soon, or whatever</p>
     </div>
 
-    <a class="footer-link" href="https://www.meggetland.com/trailer/">See the BUCS trailer plan</a><br>
-    <a class="footer-link" href="https://www.meggetland.com/regatta/">See how we're doing at BUCS!</a>
+    <div class="footer-links">
+      <a href="https://www.meggetland.com/trailer/">See the BUCS trailer plan</a>
+      <a href="https://www.meggetland.com/regatta/">See how we're doing at BUCS!</a>
+    </div>
   </div>
 </body>
 </html>
