@@ -3,292 +3,362 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>EUBC BUCS trailer loading plan</title>
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<title>EUBC Trailer Loading Plan — BUCS Regatta 2026</title>
+<link href="https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@300;400;600;700&family=SF+Pro+Text:wght@400;500;600&family=JetBrains+Mono:wght@500;700&family=Pacifico&display=swap" rel="stylesheet">
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
 <style>
   :root {
-    --bg: #f0f5f9;
-    --surface: #ffffff;
-    --border: #d0d4db;
-    --border-light: #e4e7ec;
-    --text: #1a1d23;
-    --text-muted: #6b7280;
-    --text-loaded: #bfc4cc;
-    --orange: #E97132;
-    --black: #1a1d23;
-    --dotted: #ccc;
     --baby-blue: #6bb7e0;
-    --baby-blue-light: #d6ecf7;
+    --baby-blue-light: #b8ddf0;
+    --baby-blue-pale: #e8f4fa;
     --baby-blue-dark: #3a8dba;
-    --btn-done: #196B24;
-    --btn-done-bg: rgba(25,107,36,0.08);
-    --safety-red: #d32f2f;
-    --safety-bg: #fff3f3;
-    --safety-border: #f5c6c6;
+    --baby-blue-deep: #1a6a9a;
+    --orange: #E97132;
+    --navy: #0E2841;
+    --text: #1c2536;
+    --text-secondary: #5a6a80;
+    --text-loaded: rgba(28,37,54,0.25);
+    --glass-bg: rgba(255,255,255,0.45);
+    --glass-border: rgba(255,255,255,0.65);
+    --glass-shadow: rgba(106,183,224,0.15);
+    --glass-highlight: rgba(255,255,255,0.7);
+    --btn-done: #2ecc71;
+    --btn-done-dark: #1a9e4a;
+    --safety-red: #e74c3c;
   }
 
   * { margin: 0; padding: 0; box-sizing: border-box; }
 
   body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: 'DM Sans', system-ui, sans-serif;
+    font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
     min-height: 100vh;
-    padding: 20px 12px 48px;
+    color: var(--text);
+    overflow-x: hidden;
   }
 
-  /* ── Header with baby blue accent ── */
+  /* ═══ ANIMATED BACKGROUND ═══ */
+  .bg-layer {
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    background:
+      radial-gradient(ellipse at 20% 50%, rgba(107,183,224,0.3) 0%, transparent 50%),
+      radial-gradient(ellipse at 80% 20%, rgba(184,221,240,0.4) 0%, transparent 40%),
+      radial-gradient(ellipse at 60% 80%, rgba(233,113,50,0.08) 0%, transparent 40%),
+      radial-gradient(ellipse at 40% 30%, rgba(58,141,186,0.15) 0%, transparent 50%),
+      linear-gradient(135deg, #e8f4fa 0%, #f0f7fc 30%, #fafcfe 60%, #f5f0ec 100%);
+    animation: bg-drift 20s ease-in-out infinite alternate;
+  }
+  @keyframes bg-drift {
+    0% { background-position: 0% 0%, 100% 0%, 60% 100%, 40% 30%, 0% 0%; }
+    100% { background-position: 10% 20%, 90% 30%, 50% 80%, 50% 50%, 0% 0%; }
+  }
+
+  /* Floating orbs */
+  .orb {
+    position: fixed;
+    border-radius: 50%;
+    filter: blur(60px);
+    opacity: 0.3;
+    z-index: -1;
+    animation: orb-float 15s ease-in-out infinite alternate;
+  }
+  .orb-1 { width: 300px; height: 300px; background: var(--baby-blue-light); top: -50px; left: -50px; }
+  .orb-2 { width: 250px; height: 250px; background: rgba(233,113,50,0.2); bottom: 10%; right: -30px; animation-delay: -5s; animation-duration: 18s; }
+  .orb-3 { width: 200px; height: 200px; background: var(--baby-blue); top: 40%; left: 60%; animation-delay: -8s; animation-duration: 22s; }
+  @keyframes orb-float {
+    0% { transform: translate(0, 0) scale(1); }
+    50% { transform: translate(30px, -20px) scale(1.1); }
+    100% { transform: translate(-20px, 30px) scale(0.95); }
+  }
+
+  /* ═══ GLASS MIXIN ═══ */
+  .glass {
+    background: var(--glass-bg);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    border: 1px solid var(--glass-border);
+    box-shadow:
+      0 8px 32px var(--glass-shadow),
+      inset 0 1px 0 var(--glass-highlight);
+    border-radius: 20px;
+  }
+  .glass-subtle {
+    background: rgba(255,255,255,0.3);
+    backdrop-filter: blur(12px) saturate(150%);
+    -webkit-backdrop-filter: blur(12px) saturate(150%);
+    border: 1px solid rgba(255,255,255,0.5);
+    box-shadow: 0 4px 16px rgba(106,183,224,0.1);
+    border-radius: 16px;
+  }
+
+  /* ═══ LAYOUT ═══ */
+  .page { padding: 24px 16px 60px; max-width: 960px; margin: 0 auto; }
+
+  /* ── Header ── */
   .header {
     text-align: center;
-    margin-bottom: 18px;
+    padding: 28px 20px 24px;
+    margin-bottom: 20px;
     position: relative;
+    overflow: hidden;
   }
   .header::before {
     content: '';
     position: absolute;
-    top: -20px; left: 50%;
-    transform: translateX(-50%);
-    width: 60px; height: 4px;
-    background: var(--baby-blue);
-    border-radius: 2px;
+    top: -50%; left: -50%;
+    width: 200%; height: 200%;
+    background: radial-gradient(ellipse at center, rgba(107,183,224,0.1) 0%, transparent 70%);
+    animation: header-glow 6s ease-in-out infinite alternate;
+  }
+  @keyframes header-glow {
+    0% { opacity: 0.5; transform: scale(1); }
+    100% { opacity: 1; transform: scale(1.05); }
   }
   .header h1 {
-    font-size: 1.35rem; font-weight: 700;
-    letter-spacing: -0.02em; color: var(--black); margin-bottom: 2px;
-  }
-  .header h1 .blue { color: var(--baby-blue-dark); }
-  .header p { color: var(--text-muted); font-size: 0.82rem; }
-
-  /* ── Safety banner ── */
-  .safety-banner {
-    max-width: 640px;
-    margin: 28px auto 0;
-    background: var(--safety-bg);
-    border: 2px solid var(--safety-border);
-    border-left: 6px solid var(--safety-red);
-    border-radius: 8px;
-    padding: 14px 16px;
-    display: flex;
-    align-items: flex-start;
-    gap: 12px;
-    animation: pulse-border 2s ease-in-out infinite alternate;
-  }
-  @keyframes pulse-border {
-    0% { border-left-color: var(--safety-red); box-shadow: 0 0 0 0 rgba(211,47,47,0); }
-    100% { border-left-color: #b71c1c; box-shadow: 0 0 12px 2px rgba(211,47,47,0.15); }
-  }
-  .safety-icon {
-    flex-shrink: 0;
-    width: 40px; height: 40px;
-    background: var(--safety-red);
-    border-radius: 50%;
-    display: flex; align-items: center; justify-content: center;
-    color: #fff;
-    font-size: 22px;
-    font-weight: 900;
-    animation: wobble 1.5s ease-in-out infinite;
-  }
-  @keyframes wobble {
-    0%, 100% { transform: rotate(0deg); }
-    15% { transform: rotate(-12deg); }
-    30% { transform: rotate(10deg); }
-    45% { transform: rotate(-6deg); }
-    60% { transform: rotate(4deg); }
-    75% { transform: rotate(0deg); }
-  }
-  .safety-text {
-    flex: 1;
-  }
-  .safety-text .label {
-    font-size: 0.7rem;
+    font-size: 1.6rem;
     font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    color: var(--safety-red);
+    letter-spacing: -0.03em;
+    color: var(--navy);
+    position: relative;
     margin-bottom: 4px;
-    display: flex;
-    align-items: center;
-    gap: 6px;
   }
-  .safety-text .label .stripe {
-    flex: 1; height: 2px;
-    background: repeating-linear-gradient(90deg, var(--safety-red) 0, var(--safety-red) 6px, transparent 6px, transparent 12px);
+  .header h1 .blue {
+    background: linear-gradient(135deg, var(--baby-blue-dark), var(--baby-blue));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
   }
-  .safety-text p {
-    font-size: 0.88rem;
-    font-weight: 700;
-    color: #7f1d1d;
-    line-height: 1.4;
+  .header p {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    font-weight: 400;
+    position: relative;
   }
 
   /* ── Progress ── */
-  .progress-bar {
-    max-width: 640px; margin: 0 auto 24px;
-    background: var(--surface); border-radius: 8px;
-    padding: 10px 14px; border: 1px solid var(--border-light);
+  .progress-section {
+    padding: 14px 18px;
+    margin-bottom: 22px;
   }
-  .progress-bar .label {
-    display: flex; justify-content: space-between;
-    font-size: 0.78rem; color: var(--text-muted); margin-bottom: 5px;
+  .progress-label {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    font-size: 0.78rem;
+    color: var(--text-secondary);
+    margin-bottom: 8px;
+    font-weight: 500;
   }
-  .progress-bar .label strong { color: var(--text); }
+  .progress-label strong {
+    font-size: 1.1rem;
+    color: var(--navy);
+    font-weight: 700;
+  }
   .progress-track {
-    height: 5px; background: var(--border-light); border-radius: 3px; overflow: hidden;
+    height: 6px;
+    background: rgba(107,183,224,0.15);
+    border-radius: 3px;
+    overflow: hidden;
+    position: relative;
   }
   .progress-fill {
-    height: 100%; border-radius: 3px; transition: width 0.4s ease; width: 0%;
+    height: 100%;
+    border-radius: 3px;
+    transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    width: 0%;
     background: linear-gradient(90deg, var(--baby-blue), var(--btn-done));
-  }
-
-  /* ── Layout ── */
-  .trailers {
-    display: flex; flex-wrap: wrap; gap: 28px;
-    justify-content: center; max-width: 940px; margin: 0 auto;
-  }
-  .trailer-wrap { flex: 1; min-width: 300px; max-width: 440px; }
-
-  .trailer-caption {
-    text-align: center; font-style: italic; color: var(--text-muted);
-    font-size: 0.82rem; margin-top: 8px;
-  }
-
-  /* ═══ EUBC TRAILER ═══ */
-  .eubc-diagram, .sr-diagram {
     position: relative;
-    background: var(--surface);
-    border-radius: 2px;
+  }
+  .progress-fill::after {
+    content: '';
+    position: absolute;
+    top: 0; right: 0;
+    width: 20px; height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.6));
+    border-radius: 3px;
+  }
+
+  /* ═══ TRAILERS ═══ */
+  .trailers {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 22px;
+    justify-content: center;
+    margin-bottom: 24px;
+  }
+  .trailer-wrap {
+    flex: 1;
+    min-width: 300px;
+    max-width: 440px;
+  }
+  .trailer-caption {
+    text-align: center;
+    font-style: italic;
+    color: var(--text-secondary);
+    font-size: 0.82rem;
+    margin-top: 10px;
+    font-weight: 400;
+  }
+
+  /* ═══ TRAILER DIAGRAMS — preserved outlines ═══ */
+  .eubc-diagram, .sr-diagram {
+    background: rgba(255,255,255,0.55);
+    backdrop-filter: blur(16px) saturate(160%);
+    -webkit-backdrop-filter: blur(16px) saturate(160%);
+    border: 1px solid rgba(255,255,255,0.6);
+    border-radius: 14px;
+    overflow: hidden;
+    box-shadow: 0 8px 32px var(--glass-shadow), inset 0 1px 0 var(--glass-highlight);
   }
 
   .eubc-top-row {
     display: grid;
     grid-template-columns: 1fr 1fr 1fr 1fr;
-    border-bottom: 3px solid var(--black);
-    padding: 6px 4px 8px;
+    border-bottom: 3px solid var(--navy);
+    padding: 8px 6px 10px;
   }
-
   .eubc-frame {
     position: relative;
     border-left: 2px solid var(--orange);
     border-right: 2px solid var(--orange);
   }
-
   .eubc-frame .centre-v {
     position: absolute;
     left: 50%; top: 0; bottom: 0;
-    width: 3px; background: var(--black);
+    width: 3px;
+    background: var(--navy);
     transform: translateX(-50%);
     z-index: 2;
   }
-
   .eubc-frame .guide-l,
   .eubc-frame .guide-r {
     position: absolute; top: 0; bottom: 0;
-    width: 0; border-left: 1px dotted var(--dotted);
+    width: 0;
+    border-left: 1px dotted rgba(14,40,65,0.15);
     z-index: 1;
   }
   .eubc-frame .guide-l { left: 25%; }
   .eubc-frame .guide-r { left: 75%; }
-
   .eubc-rack {
     display: grid;
     grid-template-columns: 1fr 1fr 1fr 1fr;
-    border-bottom: 3px solid var(--black);
-    position: relative; z-index: 3;
+    border-bottom: 3px solid var(--navy);
+    position: relative;
+    z-index: 3;
   }
 
-  /* ═══ SR TRAILER ═══ */
   .sr-top-row {
     display: grid;
     grid-template-columns: 1fr 1fr 1fr;
-    border-bottom: 3px solid var(--black);
-    padding: 6px 4px 8px;
+    border-bottom: 3px solid var(--navy);
+    padding: 8px 6px 10px;
   }
-
   .sr-frame { position: relative; }
-
   .sr-frame .div-1,
   .sr-frame .div-2 {
     position: absolute; top: 0; bottom: 0;
-    width: 3px; background: var(--black);
+    width: 3px;
+    background: var(--navy);
     transform: translateX(-50%);
     z-index: 2;
   }
   .sr-frame .div-1 { left: 33.33%; }
   .sr-frame .div-2 { left: 66.66%; }
-
   .sr-rack {
     display: grid;
     grid-template-columns: 1fr 1fr 1fr;
-    border-bottom: 3px solid var(--black);
-    position: relative; z-index: 3;
+    border-bottom: 3px solid var(--navy);
+    position: relative;
+    z-index: 3;
   }
 
-  /* ── Split rack: two items stacked in one grid cell ── */
-  .split-cell {
-    display: flex; flex-direction: column;
-    gap: 0;
-  }
-  .split-cell .boat-slot {
-    min-height: 28px;
-    padding: 4px 6px;
-  }
+  .split-cell { display: flex; flex-direction: column; }
+  .split-cell .boat-slot { min-height: 28px; padding: 5px 6px; }
   .split-cell .boat-slot:first-child {
-    border-bottom: 1px dashed var(--border-light);
+    border-bottom: 1px dashed rgba(14,40,65,0.15);
   }
 
-  /* ═══ BOAT SLOTS ═══ */
-  .boat-slot {
-    display: flex; align-items: center; justify-content: center;
-    gap: 5px;
-    padding: 12px 6px;
-    cursor: pointer; user-select: none; -webkit-user-select: none;
-    transition: background 0.2s ease;
-    min-height: 52px;
+  /* ═══ BOAT SLOT ═══ */
+  .boat-slot, .item {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 14px 6px;
+    cursor: pointer;
+    user-select: none;
+    -webkit-user-select: none;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    min-height: 54px;
     text-align: center;
     position: relative;
   }
-  .boat-slot:hover { background: rgba(0,0,0,0.02); }
-  .boat-slot:active { background: rgba(0,0,0,0.05); }
-
-  .boat-name {
-    font-family: 'DM Sans', sans-serif;
-    font-size: 0.85rem; font-weight: 700;
-    color: var(--text); transition: all 0.3s ease;
-    line-height: 1.3; word-break: break-word;
+  .boat-slot:hover, .item:hover {
+    background: rgba(107,183,224,0.06);
   }
-  .boat-slot.loaded .boat-name {
+  .boat-slot:active, .item:active {
+    transform: scale(0.97);
+  }
+
+  .boat-name, .item-name {
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--text);
+    transition: all 0.35s ease;
+    line-height: 1.3;
+    word-break: break-word;
+    letter-spacing: -0.01em;
+  }
+  .boat-slot.loaded .boat-name,
+  .item.loaded .item-name {
     color: var(--text-loaded);
     text-decoration: line-through;
-    text-decoration-color: var(--text-loaded);
-    font-weight: 500;
+    text-decoration-color: rgba(28,37,54,0.2);
+    font-weight: 400;
   }
 
   .load-btn {
-    width: 20px; height: 20px; min-width: 20px;
-    border-radius: 3px; border: 1.5px solid #ccc;
-    background: transparent; cursor: pointer;
-    display: flex; align-items: center; justify-content: center;
-    flex-shrink: 0; transition: all 0.2s ease;
-    color: transparent; font-size: 11px; line-height: 1;
+    width: 22px; height: 22px; min-width: 22px;
+    border-radius: 7px;
+    border: 2px solid rgba(107,183,224,0.4);
+    background: rgba(255,255,255,0.5);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    color: transparent;
+    font-size: 11px;
+    line-height: 1;
     padding: 0;
     position: relative;
     overflow: visible;
   }
   .load-btn:hover {
-    border-color: var(--btn-done); background: var(--btn-done-bg);
+    border-color: var(--btn-done);
+    background: rgba(46,204,113,0.1);
+    transform: scale(1.1);
   }
-  .boat-slot.loaded .load-btn {
-    border-color: var(--btn-done); background: var(--btn-done); color: #fff;
+  .boat-slot.loaded .load-btn,
+  .item.loaded .load-btn {
+    border-color: var(--btn-done);
+    background: linear-gradient(135deg, var(--btn-done), var(--btn-done-dark));
+    color: #fff;
+    box-shadow: 0 2px 8px rgba(46,204,113,0.3);
   }
 
-  /* Ripple ring animation */
+  .empty-slot { min-height: 54px; padding: 14px 6px; }
+
+  /* ── Ripple & confetti ── */
   .ripple-ring {
-    position: absolute;
-    top: 50%; left: 50%;
+    position: absolute; top: 50%; left: 50%;
     transform: translate(-50%, -50%) scale(0);
-    width: 40px; height: 40px;
+    width: 44px; height: 44px;
     border-radius: 50%;
     border: 2px solid var(--baby-blue);
     opacity: 1;
@@ -297,11 +367,9 @@
     animation: ripple-expand 0.5s ease-out forwards;
   }
   @keyframes ripple-expand {
-    0% { transform: translate(-50%, -50%) scale(0); opacity: 0.9; }
-    100% { transform: translate(-50%, -50%) scale(2.2); opacity: 0; }
+    0% { transform: translate(-50%, -50%) scale(0); opacity: 0.8; }
+    100% { transform: translate(-50%, -50%) scale(2.5); opacity: 0; }
   }
-
-  /* Mini confetti particle */
   .mini-confetti {
     position: absolute;
     width: 5px; height: 5px;
@@ -315,85 +383,152 @@
     100% { transform: translate(var(--mx), var(--my)) scale(0) rotate(var(--mr)); opacity: 0; }
   }
 
-  .empty-slot { min-height: 52px; padding: 12px 6px; }
-
   /* ═══ EQUIPMENT CHECKLIST ═══ */
   .checklist-section {
-    max-width: 940px;
-    margin: 28px auto 0;
+    margin-bottom: 22px;
   }
   .checklist-section h2 {
-    font-size: 0.82rem; font-weight: 700;
-    text-transform: uppercase; letter-spacing: 0.06em;
+    font-size: 0.82rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
     color: var(--baby-blue-dark);
-    margin-bottom: 10px;
-    display: flex; align-items: center; gap: 8px;
-  }
-  .checklist-section h2::before {
-    content: ''; width: 14px; height: 3px;
-    background: var(--baby-blue); border-radius: 2px;
+    margin-bottom: 12px;
+    padding-left: 4px;
   }
   .checklist-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-    gap: 12px;
+    grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+    gap: 14px;
   }
   .checklist-card {
-    background: var(--surface);
-    border: 1px solid var(--border-light);
-    border-radius: 8px;
-    padding: 10px 12px;
-    border-top: 3px solid var(--baby-blue);
+    padding: 14px 14px 10px;
+    position: relative;
+    overflow: hidden;
+  }
+  .checklist-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--baby-blue), var(--baby-blue-light));
+    border-radius: 16px 16px 0 0;
   }
   .checklist-card h3 {
-    font-size: 0.7rem; font-weight: 700;
-    text-transform: uppercase; letter-spacing: 0.06em;
+    font-size: 0.68rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
     color: var(--baby-blue-dark);
-    margin-bottom: 6px;
-    padding-bottom: 6px;
-    border-bottom: 1px solid var(--border-light);
+    margin-bottom: 8px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid rgba(107,183,224,0.15);
   }
   .checklist-card .item {
-    display: flex; align-items: center; gap: 6px;
-    padding: 5px 2px;
-    cursor: pointer; user-select: none; -webkit-user-select: none;
-    border-radius: 4px;
-    transition: background 0.2s ease;
+    padding: 6px 2px;
+    min-height: auto;
+    justify-content: flex-start;
+    border-radius: 8px;
   }
-  .checklist-card .item:hover { background: rgba(0,0,0,0.02); }
-  .checklist-card .item .item-name {
-    font-size: 0.8rem; font-weight: 600; color: var(--text);
-    transition: all 0.3s ease; flex: 1;
-  }
-  .checklist-card .item.loaded .item-name {
-    color: var(--text-loaded);
-    text-decoration: line-through;
-    font-weight: 400;
+  .checklist-card .item-name {
+    font-size: 0.78rem;
+    font-weight: 500;
+    flex: 1;
+    text-align: left;
   }
   .checklist-card .item .load-btn {
-    width: 18px; height: 18px; min-width: 18px;
+    width: 20px; height: 20px; min-width: 20px;
+    border-radius: 6px;
     font-size: 10px;
   }
-  .checklist-card .item.loaded .load-btn {
-    border-color: var(--btn-done); background: var(--btn-done); color: #fff;
+
+  /* ═══ SAFETY ═══ */
+  .safety-banner {
+    max-width: 640px;
+    margin: 0 auto 20px;
+    padding: 16px 18px;
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    background: rgba(231,76,60,0.06);
+    backdrop-filter: blur(16px) saturate(140%);
+    -webkit-backdrop-filter: blur(16px) saturate(140%);
+    border: 1px solid rgba(231,76,60,0.2);
+    border-left: 5px solid var(--safety-red);
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(231,76,60,0.08);
+    animation: safety-pulse 3s ease-in-out infinite alternate;
+  }
+  @keyframes safety-pulse {
+    0% { box-shadow: 0 4px 20px rgba(231,76,60,0.08); }
+    100% { box-shadow: 0 4px 24px rgba(231,76,60,0.18); }
+  }
+  .safety-icon {
+    flex-shrink: 0;
+    width: 38px; height: 38px;
+    background: linear-gradient(135deg, var(--safety-red), #c0392b);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-size: 20px;
+    font-weight: 900;
+    animation: wobble 2s ease-in-out infinite;
+    box-shadow: 0 4px 12px rgba(231,76,60,0.25);
+  }
+  @keyframes wobble {
+    0%, 100% { transform: rotate(0deg); }
+    15% { transform: rotate(-10deg); }
+    30% { transform: rotate(8deg); }
+    45% { transform: rotate(-4deg); }
+    60% { transform: rotate(2deg); }
+  }
+  .safety-text .label {
+    font-size: 0.68rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--safety-red);
+    margin-bottom: 4px;
+  }
+  .safety-text p {
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: #7f1d1d;
+    line-height: 1.45;
   }
 
-  /* ── Reset ── */
+  /* ═══ RESET ═══ */
   .reset-btn {
-    display: block; margin: 24px auto 0;
-    background: var(--surface); border: 1px solid var(--border-light);
-    color: var(--text-muted); padding: 7px 18px; border-radius: 6px;
-    font-family: 'DM Sans', sans-serif; font-size: 0.78rem; cursor: pointer;
-    transition: all 0.2s ease;
+    display: block;
+    margin: 20px auto 0;
+    background: rgba(255,255,255,0.4);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid rgba(255,255,255,0.5);
+    color: var(--text-secondary);
+    padding: 10px 24px;
+    border-radius: 12px;
+    font-family: inherit;
+    font-size: 0.8rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
   }
-  .reset-btn:hover { border-color: #c0392b; color: #c0392b; }
+  .reset-btn:hover {
+    border-color: rgba(231,76,60,0.4);
+    color: var(--safety-red);
+    background: rgba(231,76,60,0.05);
+  }
 
   @media (max-width: 680px) {
     .trailers { flex-direction: column; align-items: center; }
     .trailer-wrap { max-width: 100%; min-width: 0; }
-    .boat-name { font-size: 0.78rem; }
-    .boat-slot { padding: 10px 4px; min-height: 44px; }
+    .boat-name { font-size: 0.75rem; }
+    .boat-slot { padding: 10px 4px; min-height: 46px; }
     .checklist-grid { grid-template-columns: 1fr 1fr; }
+    .header h1 { font-size: 1.35rem; }
   }
   @media (max-width: 400px) {
     .checklist-grid { grid-template-columns: 1fr; }
@@ -402,184 +537,168 @@
 </head>
 <body>
 
-<div class="header">
-  <h1><span class="blue">EUBC</span> BUCS trailer plan</h1>
-  <p>Tap each boat when loaded (and tied on properly)</p>
-</div>
+<!-- Background -->
+<div class="bg-layer"></div>
+<div class="orb orb-1"></div>
+<div class="orb orb-2"></div>
+<div class="orb orb-3"></div>
 
-<!-- ═══ PROGRESS ═══ -->
-<div class="progress-bar">
-  <div class="label">
-    <span>Loading progress</span>
-    <span><strong id="loadedCount">0</strong> / <span id="totalCount">53</span></span>
+<div class="page">
+
+  <!-- Header -->
+  <div class="header glass">
+    <h1><span class="blue">EUBC</span> Trailer Loading Plan</h1>
+    <p>BUCS Regatta 2026 · Tap each item when loaded</p>
   </div>
-  <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
-</div>
 
-<div class="trailers">
-
-  <!-- ═══════ EUBC TRAILER ═══════
-       Row 2:  EHU175 | EHU290 | EHU291 | EHU292
-       Row 5:  EHU471 | EHU470 | EHU472 | EHU 284
-       Row 8:  EHU 280 | Jim Aitken LS | W USP LS | EHU 283
-       Row 11: EHU 270 | Hugh Edmiston LS | Phil McNaul LS | EHU 271
-       Row 14: Hugh Edmiston SS | Jim Aitken SS | W USP SS | Phil McNaul SS
-  -->
-  <div class="trailer-wrap">
-    <div class="eubc-diagram">
-      <div class="eubc-top-row">
-        <div class="boat-slot" data-id="ehu175"><button class="load-btn">✓</button><span class="boat-name">EHU175</span></div>
-        <div class="boat-slot" data-id="ehu290"><button class="load-btn">✓</button><span class="boat-name">EHU290</span></div>
-        <div class="boat-slot" data-id="ehu291"><button class="load-btn">✓</button><span class="boat-name">EHU291</span></div>
-        <div class="boat-slot" data-id="ehu292"><button class="load-btn">✓</button><span class="boat-name">EHU292</span></div>
-      </div>
-      <div class="eubc-frame">
-        <div class="centre-v"></div>
-        <div class="guide-l"></div>
-        <div class="guide-r"></div>
-
-        <div class="eubc-rack">
-          <div class="boat-slot" data-id="ehu471"><button class="load-btn">✓</button><span class="boat-name">EHU471</span></div>
-          <div class="boat-slot" data-id="ehu470"><button class="load-btn">✓</button><span class="boat-name">EHU470</span></div>
-          <div class="boat-slot" data-id="ehu472"><button class="load-btn">✓</button><span class="boat-name">EHU472</span></div>
-          <div class="boat-slot" data-id="ehu284"><button class="load-btn">✓</button><span class="boat-name">EHU 284</span></div>
-        </div>
-
-        <div class="eubc-rack">
-          <div class="boat-slot" data-id="ehu280"><button class="load-btn">✓</button><span class="boat-name">EHU 280</span></div>
-          <div class="boat-slot" data-id="jim-aitken-ls"><button class="load-btn">✓</button><span class="boat-name">Jim Aitken LS</span></div>
-          <div class="boat-slot" data-id="w-usp-ls"><button class="load-btn">✓</button><span class="boat-name">W USP LS</span></div>
-          <div class="boat-slot" data-id="ehu283"><button class="load-btn">✓</button><span class="boat-name">EHU 283</span></div>
-        </div>
-
-        <div class="eubc-rack">
-          <div class="boat-slot" data-id="ehu270"><button class="load-btn">✓</button><span class="boat-name">EHU 270</span></div>
-          <div class="boat-slot" data-id="hugh-edmiston-ls"><button class="load-btn">✓</button><span class="boat-name">Hugh Edmiston LS</span></div>
-          <div class="boat-slot" data-id="phil-mcnaul-ls"><button class="load-btn">✓</button><span class="boat-name">Phil McNaul LS</span></div>
-          <div class="boat-slot" data-id="ehu271"><button class="load-btn">✓</button><span class="boat-name">EHU 271</span></div>
-        </div>
-
-        <div class="eubc-rack">
-          <div class="boat-slot" data-id="hugh-edmiston-ss"><button class="load-btn">✓</button><span class="boat-name">Hugh Edmiston SS</span></div>
-          <div class="boat-slot" data-id="jim-aitken-ss"><button class="load-btn">✓</button><span class="boat-name">Jim Aitken SS</span></div>
-          <div class="boat-slot" data-id="w-usp-ss"><button class="load-btn">✓</button><span class="boat-name">W USP SS</span></div>
-          <div class="boat-slot" data-id="phil-mcnaul-ss"><button class="load-btn">✓</button><span class="boat-name">Phil McNaul SS</span></div>
-        </div>
-
-      </div>
+  <!-- Progress -->
+  <div class="progress-section glass">
+    <div class="progress-label">
+      <span>Loading progress</span>
+      <span><strong id="loadedCount">0</strong> / <span id="totalCount">53</span></span>
     </div>
-    <div class="trailer-caption">EUBC trailer</div>
+    <div class="progress-track">
+      <div class="progress-fill" id="progressFill"></div>
+    </div>
   </div>
 
-  <!-- ═══════ SR TRAILER ═══════
-       Row 2:  Plank | Matthews | EHU193
-       Row 5:  Ronan | Callum | EHU490
-       Row 8:  EHU480 | KG II LS | Sarju
-       Row 11: EHU171 + EHU170 (split) | KG II SS | EHU173 + EHU174 (split)
-  -->
-  <div class="trailer-wrap">
-    <div class="sr-diagram">
-      <div class="sr-top-row">
-        <div class="boat-slot" data-id="plank"><button class="load-btn">✓</button><span class="boat-name">Plank</span></div>
-        <div class="boat-slot" data-id="matthews"><button class="load-btn">✓</button><span class="boat-name">Matthews</span></div>
-        <div class="boat-slot" data-id="ehu193"><button class="load-btn">✓</button><span class="boat-name">EHU193</span></div>
-      </div>
-      <div class="sr-frame">
-        <div class="div-1"></div>
-        <div class="div-2"></div>
+  <!-- Trailers -->
+  <div class="trailers">
 
-        <div class="sr-rack">
-          <div class="boat-slot" data-id="ronan"><button class="load-btn">✓</button><span class="boat-name">Ronan</span></div>
-          <div class="boat-slot" data-id="callum"><button class="load-btn">✓</button><span class="boat-name">Callum</span></div>
-          <div class="boat-slot" data-id="ehu490"><button class="load-btn">✓</button><span class="boat-name">EHU490</span></div>
+    <!-- EUBC TRAILER -->
+    <div class="trailer-wrap">
+      <div class="eubc-diagram">
+        <div class="eubc-top-row">
+          <div class="boat-slot" data-id="ehu175"><button class="load-btn">✓</button><span class="boat-name">EHU175</span></div>
+          <div class="boat-slot" data-id="ehu290"><button class="load-btn">✓</button><span class="boat-name">EHU290</span></div>
+          <div class="boat-slot" data-id="ehu291"><button class="load-btn">✓</button><span class="boat-name">EHU291</span></div>
+          <div class="boat-slot" data-id="ehu292"><button class="load-btn">✓</button><span class="boat-name">EHU292</span></div>
         </div>
-
-        <div class="sr-rack">
-          <div class="boat-slot" data-id="ehu480"><button class="load-btn">✓</button><span class="boat-name">EHU480</span></div>
-          <div class="boat-slot" data-id="kg-ii-ls"><button class="load-btn">✓</button><span class="boat-name">KG II LS</span></div>
-          <div class="boat-slot" data-id="sarju"><button class="load-btn">✓</button><span class="boat-name">Sarju</span></div>
-        </div>
-
-        <div class="sr-rack">
-          <div class="split-cell">
-            <div class="boat-slot" data-id="ehu171"><button class="load-btn">✓</button><span class="boat-name">EHU 171</span></div>
-            <div class="boat-slot" data-id="ehu170"><button class="load-btn">✓</button><span class="boat-name">EHU 170</span></div>
+        <div class="eubc-frame">
+          <div class="centre-v"></div>
+          <div class="guide-l"></div>
+          <div class="guide-r"></div>
+          <div class="eubc-rack">
+            <div class="boat-slot" data-id="ehu471"><button class="load-btn">✓</button><span class="boat-name">EHU471</span></div>
+            <div class="boat-slot" data-id="ehu470"><button class="load-btn">✓</button><span class="boat-name">EHU470</span></div>
+            <div class="boat-slot" data-id="ehu472"><button class="load-btn">✓</button><span class="boat-name">EHU472</span></div>
+            <div class="boat-slot" data-id="ehu284"><button class="load-btn">✓</button><span class="boat-name">EHU 284</span></div>
           </div>
-          <div class="boat-slot" data-id="kg-ii-ss"><button class="load-btn">✓</button><span class="boat-name">KG II SS</span></div>
-          <div class="split-cell">
-            <div class="boat-slot" data-id="ehu173"><button class="load-btn">✓</button><span class="boat-name">EHU 173</span></div>
-            <div class="boat-slot" data-id="ehu174"><button class="load-btn">✓</button><span class="boat-name">EHU 174</span></div>
+          <div class="eubc-rack">
+            <div class="boat-slot" data-id="ehu280"><button class="load-btn">✓</button><span class="boat-name">EHU 280</span></div>
+            <div class="boat-slot" data-id="jim-aitken-ls"><button class="load-btn">✓</button><span class="boat-name">Jim Aitken LS</span></div>
+            <div class="boat-slot" data-id="w-usp-ls"><button class="load-btn">✓</button><span class="boat-name">W USP LS</span></div>
+            <div class="boat-slot" data-id="ehu283"><button class="load-btn">✓</button><span class="boat-name">EHU 283</span></div>
+          </div>
+          <div class="eubc-rack">
+            <div class="boat-slot" data-id="ehu270"><button class="load-btn">✓</button><span class="boat-name">EHU 270</span></div>
+            <div class="boat-slot" data-id="hugh-edmiston-ls"><button class="load-btn">✓</button><span class="boat-name">Hugh Edmiston LS</span></div>
+            <div class="boat-slot" data-id="phil-mcnaul-ls"><button class="load-btn">✓</button><span class="boat-name">Phil McNaul LS</span></div>
+            <div class="boat-slot" data-id="ehu271"><button class="load-btn">✓</button><span class="boat-name">EHU 271</span></div>
+          </div>
+          <div class="eubc-rack">
+            <div class="boat-slot" data-id="hugh-edmiston-ss"><button class="load-btn">✓</button><span class="boat-name">Hugh Edmiston SS</span></div>
+            <div class="boat-slot" data-id="jim-aitken-ss"><button class="load-btn">✓</button><span class="boat-name">Jim Aitken SS</span></div>
+            <div class="boat-slot" data-id="w-usp-ss"><button class="load-btn">✓</button><span class="boat-name">W USP SS</span></div>
+            <div class="boat-slot" data-id="phil-mcnaul-ss"><button class="load-btn">✓</button><span class="boat-name">Phil McNaul SS</span></div>
           </div>
         </div>
+      </div>
+      <div class="trailer-caption">EUBC trailer</div>
+    </div>
 
+    <!-- SR TRAILER -->
+    <div class="trailer-wrap">
+      <div class="sr-diagram">
+        <div class="sr-top-row">
+          <div class="boat-slot" data-id="plank"><button class="load-btn">✓</button><span class="boat-name">Plank</span></div>
+          <div class="boat-slot" data-id="matthews"><button class="load-btn">✓</button><span class="boat-name">Matthews</span></div>
+          <div class="boat-slot" data-id="ehu193"><button class="load-btn">✓</button><span class="boat-name">EHU193</span></div>
+        </div>
+        <div class="sr-frame">
+          <div class="div-1"></div>
+          <div class="div-2"></div>
+          <div class="sr-rack">
+            <div class="boat-slot" data-id="ronan"><button class="load-btn">✓</button><span class="boat-name">Ronan</span></div>
+            <div class="boat-slot" data-id="callum"><button class="load-btn">✓</button><span class="boat-name">Callum</span></div>
+            <div class="boat-slot" data-id="ehu490"><button class="load-btn">✓</button><span class="boat-name">EHU490</span></div>
+          </div>
+          <div class="sr-rack">
+            <div class="boat-slot" data-id="ehu480"><button class="load-btn">✓</button><span class="boat-name">EHU480</span></div>
+            <div class="boat-slot" data-id="kg-ii-ls"><button class="load-btn">✓</button><span class="boat-name">KG II LS</span></div>
+            <div class="boat-slot" data-id="sarju"><button class="load-btn">✓</button><span class="boat-name">Sarju</span></div>
+          </div>
+          <div class="sr-rack">
+            <div class="split-cell">
+              <div class="boat-slot" data-id="ehu171"><button class="load-btn">✓</button><span class="boat-name">EHU 171</span></div>
+              <div class="boat-slot" data-id="ehu170"><button class="load-btn">✓</button><span class="boat-name">EHU 170</span></div>
+            </div>
+            <div class="boat-slot" data-id="kg-ii-ss"><button class="load-btn">✓</button><span class="boat-name">KG II SS</span></div>
+            <div class="split-cell">
+              <div class="boat-slot" data-id="ehu173"><button class="load-btn">✓</button><span class="boat-name">EHU 173</span></div>
+              <div class="boat-slot" data-id="ehu174"><button class="load-btn">✓</button><span class="boat-name">EHU 174</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="trailer-caption">Scottish Rowing trailer</div>
+    </div>
+  </div>
+
+  <!-- Equipment Checklist -->
+  <div class="checklist-section">
+    <h2>Oars &amp; Equipment</h2>
+    <div class="checklist-grid">
+      <div class="checklist-card glass-subtle">
+        <h3>Sweep Oars</h3>
+        <div class="item" data-id="oar-mens-one-blue"><button class="load-btn">✓</button><span class="item-name">Men's One Blue</span></div>
+        <div class="item" data-id="oar-mens-two-blue"><button class="load-btn">✓</button><span class="item-name">Men's Two Blue</span></div>
+        <div class="item" data-id="oar-womens-yellowpink"><button class="load-btn">✓</button><span class="item-name">Women's Yellow/Pink (plain edge)</span></div>
+        <div class="item" data-id="oar-womens-one-yellow"><button class="load-btn">✓</button><span class="item-name">Women's One Yellow (plain edge)</span></div>
+        <div class="item" data-id="oar-fat2s"><button class="load-btn">✓</button><span class="item-name">Fat2s</span></div>
+      </div>
+      <div class="checklist-card glass-subtle">
+        <h3>Sculling Oars</h3>
+        <div class="item" data-id="scull-croker-arrows"><button class="load-btn">✓</button><span class="item-name">Croker Arrows (four sets)</span></div>
+        <div class="item" data-id="scull-fat2-skinny"><button class="load-btn">✓</button><span class="item-name">Fat2 Skinny (six sets)</span></div>
+        <div class="item" data-id="scull-fat2-canal"><button class="load-btn">✓</button><span class="item-name">Fat2 canal (three sets)</span></div>
+        <div class="item" data-id="scull-canal"><button class="load-btn">✓</button><span class="item-name">Canal sculls</span></div>
+        <div class="item" data-id="scull-red-yellow"><button class="load-btn">✓</button><span class="item-name">Red/Yellow (all sets)</span></div>
+        <div class="item" data-id="scull-blue-red"><button class="load-btn">✓</button><span class="item-name">Blue/Red</span></div>
+      </div>
+      <div class="checklist-card glass-subtle">
+        <h3>Coxes Checklist</h3>
+        <div class="item" data-id="cox-lifejackets"><button class="load-btn">✓</button><span class="item-name">Lifejackets</span></div>
+        <div class="item" data-id="cox-coxboxes"><button class="load-btn">✓</button><span class="item-name">Coxboxes (and chargers)</span></div>
+        <div class="item" data-id="cox-chargers"><button class="load-btn">✓</button><span class="item-name">Chargers</span></div>
+        <div class="item" data-id="cox-weights"><button class="load-btn">✓</button><span class="item-name">Weights</span></div>
+      </div>
+      <div class="checklist-card glass-subtle">
+        <h3>General Items</h3>
+        <div class="item" data-id="gen-speedcoaches"><button class="load-btn">✓</button><span class="item-name">Speedcoaches (and chargers)</span></div>
+        <div class="item" data-id="gen-trestles"><button class="load-btn">✓</button><span class="item-name">Trestles</span></div>
+        <div class="item" data-id="gen-low-stands"><button class="load-btn">✓</button><span class="item-name">Low stands</span></div>
+        <div class="item" data-id="gen-spare-parts"><button class="load-btn">✓</button><span class="item-name">Spare parts boxes</span></div>
       </div>
     </div>
-    <div class="trailer-caption">Scottish Rowing trailer</div>
   </div>
 
-</div>
-
-<!-- ═══ EQUIPMENT CHECKLIST ═══ -->
-<div class="checklist-section">
-  <h2>Oars &amp; Equipment Checklist</h2>
-  <div class="checklist-grid">
-
-    <div class="checklist-card">
-      <h3>Sweep Oars</h3>
-      <div class="item" data-id="oar-mens-one-blue"><button class="load-btn">✓</button><span class="item-name">Men's One Blue</span></div>
-      <div class="item" data-id="oar-mens-two-blue"><button class="load-btn">✓</button><span class="item-name">Men's Two Blue</span></div>
-      <div class="item" data-id="oar-womens-yellowpink"><button class="load-btn">✓</button><span class="item-name">Women's Yellow/Pink (plain edge)</span></div>
-      <div class="item" data-id="oar-womens-one-yellow"><button class="load-btn">✓</button><span class="item-name">Women's One Yellow (plain edge)</span></div>
-      <div class="item" data-id="oar-fat2s"><button class="load-btn">✓</button><span class="item-name">Fat2s</span></div>
+  <!-- Safety -->
+  <div class="safety-banner">
+    <div class="safety-icon">⚠</div>
+    <div class="safety-text">
+      <div class="label">Pre-Loading Safety Check</div>
+      <p>CHECK HEEL RESTRAINTS, HATCH COVERS, BOW BALLS, SHOE SCREWS BEFORE LOADING</p>
     </div>
-
-    <div class="checklist-card">
-      <h3>Sculling Oars</h3>
-      <div class="item" data-id="scull-croker-arrows"><button class="load-btn">✓</button><span class="item-name">Croker Arrows (four sets)</span></div>
-      <div class="item" data-id="scull-fat2-skinny"><button class="load-btn">✓</button><span class="item-name">Fat2 Skinny (six sets)</span></div>
-      <div class="item" data-id="scull-fat2-canal"><button class="load-btn">✓</button><span class="item-name">Fat2 canal (three sets)</span></div>
-      <div class="item" data-id="scull-canal"><button class="load-btn">✓</button><span class="item-name">Canal sculls</span></div>
-      <div class="item" data-id="scull-red-yellow"><button class="load-btn">✓</button><span class="item-name">Red/Yellow (all sets)</span></div>
-      <div class="item" data-id="scull-blue-red"><button class="load-btn">✓</button><span class="item-name">Blue/Red</span></div>
-    </div>
-
-    <div class="checklist-card">
-      <h3>Coxes Checklist</h3>
-      <div class="item" data-id="cox-lifejackets"><button class="load-btn">✓</button><span class="item-name">Lifejackets</span></div>
-      <div class="item" data-id="cox-coxboxes"><button class="load-btn">✓</button><span class="item-name">Coxboxes</span></div>
-      <div class="item" data-id="cox-chargers"><button class="load-btn">✓</button><span class="item-name">Chargers</span></div>
-      <div class="item" data-id="cox-weights"><button class="load-btn">✓</button><span class="item-name">Weights</span></div>
-    </div>
-
-    <div class="checklist-card">
-      <h3>General Items</h3>
-      <div class="item" data-id="gen-speedcoaches"><button class="load-btn">✓</button><span class="item-name">Speedcoaches (and chargers)</span></div>
-      <div class="item" data-id="gen-trestles"><button class="load-btn">✓</button><span class="item-name">Trestles</span></div>
-      <div class="item" data-id="gen-low-stands"><button class="load-btn">✓</button><span class="item-name">Low stands</span></div>
-      <div class="item" data-id="gen-spare-parts"><button class="load-btn">✓</button><span class="item-name">Spare parts boxes</span></div>
-    </div>
-
   </div>
-</div>
 
-<!-- ═══ SAFETY BANNER ═══ -->
-<div class="safety-banner">
-  <div class="safety-icon">⚠</div>
-  <div class="safety-text">
-    <div class="label">
-      <span>Pre-Loading Safety Check</span>
-      <span class="stripe"></span>
-    </div>
-    <p>PLEASE CHECK HEEL RESTRAINTS, HATCH COVERS, BOW BALLS, SHOE SCREWS BEFORE LOADING - report any issues to coaches</p>
-  </div>
+  <button class="reset-btn" id="resetBtn">Reset all</button>
 </div>
-
-<button class="reset-btn" id="resetBtn">Reset all</button>
 
 <script>
 (function() {
-  // ── Firebase setup ──
-  const firebaseConfig = {
+  // ── Firebase ──
+  firebase.initializeApp({
     apiKey: "AIzaSyCzmr4npgGLg7IZilxdYNXPqKwiPtMJrs8",
     authDomain: "trailerplan-a3a9d.firebaseapp.com",
     databaseURL: "https://trailerplan-a3a9d-default-rtdb.europe-west1.firebasedatabase.app",
@@ -587,43 +706,129 @@
     storageBucket: "trailerplan-a3a9d.firebasestorage.app",
     messagingSenderId: "600281786846",
     appId: "1:600281786846:web:8db32790d80e4ef6f6954f"
-  };
-  firebase.initializeApp(firebaseConfig);
+  });
   const db = firebase.database().ref('trailer-state-v2');
-
-  // All tappable items (boats + equipment)
   const allItems = document.querySelectorAll('.boat-slot, .checklist-card .item');
   const totalCount = allItems.length;
   document.getElementById('totalCount').textContent = totalCount;
 
-  let previousLoaded = 0;
-
-  // ── Sound engine (Web Audio API) ──
+  // ── Audio ──
   let audioCtx = null;
   function getAudioCtx() {
     if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
     if (audioCtx.state === 'suspended') audioCtx.resume();
     return audioCtx;
   }
-  // Warm up audio context on any user interaction
-  document.addEventListener('click', function warmUp() {
-    getAudioCtx();
-    document.removeEventListener('click', warmUp);
-  }, { once: true });
+  document.addEventListener('click', function w() { getAudioCtx(); document.removeEventListener('click', w); }, { once: true });
+
+  let previousLoaded = 0;
 
   function refresh() {
     const n = document.querySelectorAll('.boat-slot.loaded, .checklist-card .item.loaded').length;
     document.getElementById('loadedCount').textContent = n;
     document.getElementById('progressFill').style.width = ((n / totalCount) * 100) + '%';
-    if (n === totalCount && previousLoaded < totalCount) {
-      celebrate();
-    }
+    if (n === totalCount && previousLoaded < totalCount) celebrate();
     previousLoaded = n;
   }
 
+  // ═══ JAPAN-STYLE CELEBRATION MUSIC (8 seconds) ═══
+  function playJapanFanfare() {
+    const ac = getAudioCtx();
+    if (ac.state === 'suspended') ac.resume();
+    const now = ac.currentTime;
+
+    function note(type, freq, start, dur, vol, vibrato) {
+      const o = ac.createOscillator();
+      const g = ac.createGain();
+      o.type = type;
+      o.frequency.setValueAtTime(freq, now + start);
+      if (vibrato) {
+        const lfo = ac.createOscillator();
+        const lfoG = ac.createGain();
+        lfo.frequency.value = 5.5;
+        lfoG.gain.value = vibrato;
+        lfo.connect(lfoG);
+        lfoG.connect(o.frequency);
+        lfo.start(now + start);
+        lfo.stop(now + start + dur);
+      }
+      g.gain.setValueAtTime(0, now + start);
+      g.gain.linearRampToValueAtTime(vol, now + start + 0.02);
+      g.gain.setValueAtTime(vol, now + start + dur * 0.7);
+      g.gain.exponentialRampToValueAtTime(0.001, now + start + dur);
+      o.connect(g);
+      g.connect(ac.destination);
+      o.start(now + start);
+      o.stop(now + start + dur + 0.05);
+    }
+
+    // Japanese pentatonic: C D E G A (Yo scale) with some miyako-bushi touches
+    const bpm = 100;
+    const q = 60 / bpm;
+    const e = q / 2;
+    const s = q / 4;
+    const h = q * 2;
+
+    // Koto-like melody (triangle wave with vibrato)
+    const melody = [
+      // Opening: gentle ascending motif
+      [523,q],[659,q],[784,h],         // C5 E5 G5
+      [880,q],[784,e],[659,e],[784,q+h], // A5 G5 E5 G5(held)
+      // Middle: flowing pentatonic phrase
+      [1047,e],[880,q],[784,e],        // C6 A5 G5
+      [659,q],[523,e],[659,e],[784,q], // E5 C5 E5 G5
+      [880,q],[1047,e],[880,e],[784,h],// A5 C6 A5 G5
+      // Resolution: descending with grace
+      [659,q],[784,e],[659,e],         // E5 G5 E5
+      [523,h+q],                        // C5 (long held)
+    ];
+
+    let t = 0;
+    melody.forEach(([f, d]) => {
+      note('triangle', f, t, d * 0.92, 0.09, 3);
+      t += d;
+    });
+
+    // Shakuhachi-like harmony (sine, breathy, delayed)
+    const harmony = [
+      [0, q*2], // rest
+      [392, h], [330, q], [392, q+h],     // G4 E4 G4
+      [523, q], [440, e], [392, e+q],     // C5 A4 G4
+      [330, q], [262, e], [330, e], [392, q],
+      [440, q], [523, e], [440, e], [392, h],
+      [330, q], [392, e], [330, e],
+      [262, h+q],
+    ];
+    let th = 0;
+    harmony.forEach(([f, d]) => {
+      if (f > 0) note('sine', f, th, d * 0.88, 0.05, 2);
+      th += d;
+    });
+
+    // Deep taiko-like hits (low sine pulses)
+    const taiko = [0, q*2, q*4, q*4+h, q*6, q*8, q*10, q*12];
+    taiko.forEach(t => {
+      const o = ac.createOscillator();
+      const g = ac.createGain();
+      o.type = 'sine';
+      o.frequency.setValueAtTime(80, now + t);
+      o.frequency.exponentialRampToValueAtTime(40, now + t + 0.3);
+      g.gain.setValueAtTime(0.12, now + t);
+      g.gain.exponentialRampToValueAtTime(0.001, now + t + 0.5);
+      o.connect(g); g.connect(ac.destination);
+      o.start(now + t); o.stop(now + t + 0.6);
+    });
+
+    // Gentle wind chime shimmer (high sine harmonics)
+    [q, q*3, q*5, q*7, q*9, q*11, q*13].forEach(t => {
+      const f = [2093, 2349, 2637, 1568][Math.floor(Math.random()*4)];
+      note('sine', f, t, 0.4, 0.02, 0);
+    });
+  }
+
+  // ═══ CELEBRATION ═══
   function celebrate() {
     const canvas = document.createElement('canvas');
-    canvas.id = 'confetti-canvas';
     Object.assign(canvas.style, {
       position:'fixed', top:'0', left:'0', width:'100%', height:'100%',
       pointerEvents:'none', zIndex:'9999'
@@ -633,558 +838,196 @@
     canvas.height = window.innerHeight;
     const ctx = canvas.getContext('2d');
 
-    const colours = ['#6bb7e0','#3a8dba','#E97132','#196B24','#A02B93','#0F9ED5','#4EA72E','#FFD700','#FF4444','#FF69B4','#00CED1'];
+    const colours = ['#6bb7e0','#3a8dba','#E97132','#FFD700','#FF69B4','#2ecc71','#b8ddf0','#e8f4fa'];
     const particles = [];
-    const fireworks = [];
     let startTime = performance.now();
-    let nextWave = 0;
-    let waveCount = 0;
-    const totalWaves = 16;
-    let bannerShown = false;
-    let bannerAlpha = 0;
-    let bannerScale = 0;
+    let bannerAlpha = 0, bannerScale = 0;
 
-    // ── 8-BIT VICTORY FANFARE ──
-    function playVictoryFanfare() {
-      const ac = getAudioCtx();
-      if (ac.state === 'suspended') ac.resume();
+    playJapanFanfare();
 
-      function sq(freq, start, dur, vol) {
-        const o = ac.createOscillator();
-        const g = ac.createGain();
-        o.type = 'square';
-        o.frequency.setValueAtTime(freq, ac.currentTime + start);
-        g.gain.setValueAtTime(vol || 0.08, ac.currentTime + start);
-        g.gain.setValueAtTime(vol || 0.08, ac.currentTime + start + dur - 0.015);
-        g.gain.linearRampToValueAtTime(0, ac.currentTime + start + dur);
-        o.connect(g);
-        g.connect(ac.destination);
-        o.start(ac.currentTime + start);
-        o.stop(ac.currentTime + start + dur);
-      }
-
-      function tri(freq, start, dur, vol) {
-        const o = ac.createOscillator();
-        const g = ac.createGain();
-        o.type = 'triangle';
-        o.frequency.setValueAtTime(freq, ac.currentTime + start);
-        g.gain.setValueAtTime(vol || 0.06, ac.currentTime + start);
-        g.gain.setValueAtTime(vol || 0.06, ac.currentTime + start + dur - 0.015);
-        g.gain.linearRampToValueAtTime(0, ac.currentTime + start + dur);
-        o.connect(g);
-        g.connect(ac.destination);
-        o.start(ac.currentTime + start);
-        o.stop(ac.currentTime + start + dur);
-      }
-
-      // Noise percussion
-      function noise(start, dur) {
-        const buf = ac.createBuffer(1, ac.sampleRate * dur, ac.sampleRate);
-        const data = buf.getChannelData(0);
-        for (let i = 0; i < data.length; i++) data[i] = Math.random() * 2 - 1;
-        const src = ac.createBufferSource();
-        src.buffer = buf;
-        const g = ac.createGain();
-        const filt = ac.createBiquadFilter();
-        filt.type = 'highpass';
-        filt.frequency.value = 5000;
-        src.connect(filt);
-        filt.connect(g);
-        g.connect(ac.destination);
-        g.gain.setValueAtTime(0.04, ac.currentTime + start);
-        g.gain.exponentialRampToValueAtTime(0.001, ac.currentTime + start + dur);
-        src.start(ac.currentTime + start);
-        src.stop(ac.currentTime + start + dur);
-      }
-
-      const bpm = 160;
-      const q = 60 / bpm; // quarter note
-      const e = q / 2;    // eighth
-      const s = q / 4;    // sixteenth
-      const h = q * 2;    // half
-      const w = q * 4;    // whole
-
-      // === SECTION 1: Opening fanfare (0-3s) - quick ascending staccato run ===
-      let t = 0;
-      // Rapid ascending C major arpeggio
-      const run1 = [523, 587, 659, 784, 880, 988, 1047, 1175, 1319, 1568];
-      run1.forEach((f, i) => {
-        sq(f, t + i * s, s * 0.8, 0.07);
-        if (i % 2 === 0) noise(t + i * s, 0.03);
-      });
-      t += run1.length * s;
-
-      // Big triumphant two-hit punch
-      sq(1568, t, e, 0.10); // G6
-      tri(784, t, e, 0.07); // G5 harmony
-      noise(t, 0.05);
-      t += e + s;
-      sq(2093, t, q, 0.12); // C7 - the big note
-      tri(1047, t, q, 0.08); // C6 harmony
-      tri(659, t, q, 0.06);  // E5 harmony
-      noise(t, 0.06);
-      t += q + e;
-
-      // === SECTION 2: Bouncy celebration melody (3-9s) ===
-      const melody2 = [
-        // Phrase 1: bouncy major theme
-        [1047,e],[1319,e],[1568,e],[1319,s],[1047,s],
-        [1175,e],[1319,q],[0,e],
-        [1047,e],[1319,e],[1568,e],[1760,s],[1568,s],
-        [1319,e],[1175,q],[0,e],
-        // Phrase 2: variation with higher peak
-        [1568,e],[1760,e],[2093,e],[1760,s],[1568,s],
-        [1319,e],[1568,q],[0,e],
-        [1568,e],[1319,e],[1175,e],[1047,s],[1175,s],
-        [1319,q+e],[0,e],
-      ];
-      // Bass line
-      const bass2 = [
-        [523,q],[0,e],[523,e],[659,q],[0,e],[659,e],
-        [523,q],[0,e],[523,e],[587,q],[0,e],[587,e],
-        [784,q],[0,e],[784,e],[659,q],[0,e],[659,e],
-        [784,q],[0,e],[784,e],[523,q],[0,e],[523,e],
-      ];
-
-      let tm = t;
-      melody2.forEach(([f, d]) => {
-        if (f > 0) sq(f, tm, d * 0.85, 0.08);
-        tm += d;
-      });
-      let tb = t;
-      bass2.forEach(([f, d]) => {
-        if (f > 0) tri(f, tb, d * 0.85, 0.05);
-        tb += d;
-      });
-      // Percussion pattern
-      for (let i = 0; i < 16; i++) {
-        noise(t + i * q, 0.04);
-        if (i % 2 === 0) noise(t + i * q + e, 0.02);
-      }
-      t = tm;
-
-      // === SECTION 3: Bridge / build-up (9-13s) ===
-      const bridge = [
-        [1319,e],[1319,s],[1319,s],[1568,e],[1319,e],
-        [1175,e],[1175,s],[1175,s],[1319,e],[1175,e],
-        [1047,e],[1175,e],[1319,e],[1568,e],
-        [1760,e],[1568,e],[1319,e],[1175,e],
-        // Ascending build
-        [1047,s],[1175,s],[1319,s],[1568,s],
-        [1760,s],[1976,s],[2093,s],[2349,s],
-      ];
-      const bridgeBass = [
-        [880,q],[0,e],[880,e],[784,q],[0,e],[784,e],
-        [659,q],[0,e],[659,e],[587,q],[0,e],[587,e],
-        [523,e],[587,e],[659,e],[784,e],
-      ];
-      let tbr = t;
-      bridge.forEach(([f, d]) => {
-        if (f > 0) sq(f, tbr, d * 0.85, 0.08);
-        tbr += d;
-      });
-      let tbb = t;
-      bridgeBass.forEach(([f, d]) => {
-        if (f > 0) tri(f, tbb, d * 0.85, 0.06);
-        tbb += d;
-      });
-      for (let i = 0; i < 10; i++) {
-        noise(t + i * q, 0.04);
-      }
-      t = tbr;
-
-      // === SECTION 4: Grand finale (13-17s) ===
-      // Triumphant repeated motif
-      const finale = [
-        [2093,e],[0,s],[2093,e],[1568,e],[1319,e],[1568,q],
-        [0,e],
-        [2093,e],[0,s],[2093,e],[2349,e],[2093,e],[1568,q],
-        [0,e],
-        [2093,e],[2349,e],[2637,q+e],
-      ];
-      const finaleBass = [
-        [523,q],[659,q],[784,q],[523,q],
-        [523,q],[659,q],[784,q],[523,q],
-        [523,q],[659,q],[784,h],
-      ];
-      let tf = t;
-      finale.forEach(([f, d]) => {
-        if (f > 0) sq(f, tf, d * 0.85, 0.10);
-        tf += d;
-      });
-      let tfb = t;
-      finaleBass.forEach(([f, d]) => {
-        if (f > 0) tri(f, tfb, d * 0.85, 0.07);
-        tfb += d;
-      });
-      for (let i = 0; i < 8; i++) {
-        noise(t + i * q, 0.05);
-        noise(t + i * q + e, 0.03);
-      }
-      t = tf;
-
-      // === ENDING: Big held chord that fades (17-19s) ===
-      function held(freq, start, dur, vol) {
-        const o = ac.createOscillator();
-        const g = ac.createGain();
-        o.type = 'square';
-        o.frequency.setValueAtTime(freq, ac.currentTime + start);
-        g.gain.setValueAtTime(vol, ac.currentTime + start);
-        g.gain.exponentialRampToValueAtTime(0.001, ac.currentTime + start + dur);
-        o.connect(g);
-        g.connect(ac.destination);
-        o.start(ac.currentTime + start);
-        o.stop(ac.currentTime + start + dur);
-      }
-      // C major chord, big and wide
-      held(1047, t, 2.5, 0.09); // C6
-      held(1319, t, 2.5, 0.07); // E6
-      held(1568, t, 2.5, 0.07); // G6
-      held(2093, t, 2.5, 0.08); // C7
-      held(523, t, 2.5, 0.06);  // C5
-      // Triangle sub
-      const o = ac.createOscillator();
-      const g = ac.createGain();
-      o.type = 'triangle';
-      o.frequency.setValueAtTime(262, ac.currentTime + t);
-      g.gain.setValueAtTime(0.07, ac.currentTime + t);
-      g.gain.exponentialRampToValueAtTime(0.001, ac.currentTime + t + 3);
-      o.connect(g); g.connect(ac.destination);
-      o.start(ac.currentTime + t);
-      o.stop(ac.currentTime + t + 3);
-
-      noise(t, 0.1);
-    }
-
-    // Play the fanfare immediately
-    playVictoryFanfare();
-
-    function spawnBurst(ox, oy, count, power) {
+    function burst(ox, oy, count, power) {
       for (let i = 0; i < count; i++) {
         const angle = Math.random() * Math.PI * 2;
-        const speed = power * (0.4 + Math.random());
-        const shapes = ['rect','circle','star','streamer'];
+        const speed = power * (0.3 + Math.random());
         particles.push({
           x: ox, y: oy,
           vx: Math.cos(angle) * speed,
           vy: Math.sin(angle) * speed - 2,
-          size: 2 + Math.random() * 7,
+          size: 2 + Math.random() * 6,
           colour: colours[Math.floor(Math.random() * colours.length)],
           life: 1,
-          decay: 0.003 + Math.random() * 0.005,
+          decay: 0.004 + Math.random() * 0.006,
           rotation: Math.random() * 360,
-          rotSpeed: (Math.random() - 0.5) * 15,
-          shape: shapes[Math.floor(Math.random() * shapes.length)],
+          rotSpeed: (Math.random() - 0.5) * 12,
+          shape: ['rect','circle','star'][Math.floor(Math.random()*3)],
           wobble: Math.random() * Math.PI * 2,
-          wobbleSpeed: 0.02 + Math.random() * 0.04
+          wobbleSpeed: 0.02 + Math.random() * 0.03
         });
       }
     }
 
-    function spawnFirework(x, y) {
-      fireworks.push({
-        x, y: canvas.height + 10,
-        targetY: y,
-        speed: 6 + Math.random() * 4,
-        colour: colours[Math.floor(Math.random() * colours.length)],
-        exploded: false,
-        trail: []
-      });
-    }
-
-    function drawStar(ctx, size) {
-      ctx.beginPath();
-      for (let i = 0; i < 5; i++) {
-        const angle = (i * 4 * Math.PI) / 5 - Math.PI / 2;
-        const method = i === 0 ? 'moveTo' : 'lineTo';
-        ctx[method](Math.cos(angle) * size, Math.sin(angle) * size);
-      }
-      ctx.closePath();
-      ctx.fill();
-    }
-
-    const fwTimes = [200,600,1100,1700,2400,3000,3500,4200,4800,5500,6200,6800,7500,8200,9000,9800,10500,11300,12000,12800,13500,14200,15000,16000,17000];
-    let fwIndex = 0;
+    // Schedule bursts
+    let nextBurst = 0, burstCount = 0;
 
     function frame(now) {
       const elapsed = now - startTime;
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-      if (waveCount < totalWaves && elapsed > nextWave) {
-        const positions = [
-          {x: Math.random()*canvas.width, y: canvas.height*0.2 + Math.random()*canvas.height*0.3},
-          {x: Math.random()*canvas.width, y: canvas.height*0.1 + Math.random()*canvas.height*0.3},
-          {x: Math.random()*canvas.width, y: canvas.height*0.2 + Math.random()*canvas.height*0.2},
-        ];
-        positions.forEach(p => spawnBurst(p.x, p.y, 50, 6 + Math.random()*5));
-        nextWave = elapsed + 400 + Math.random() * 600;
-        waveCount++;
+      if (burstCount < 10 && elapsed > nextBurst) {
+        burst(Math.random()*canvas.width, canvas.height*0.15 + Math.random()*canvas.height*0.35, 40, 5+Math.random()*4);
+        nextBurst = elapsed + 300 + Math.random()*500;
+        burstCount++;
       }
-
-      while (fwIndex < fwTimes.length && elapsed > fwTimes[fwIndex]) {
-        spawnFirework(
-          canvas.width * (0.15 + Math.random() * 0.7),
-          canvas.height * (0.1 + Math.random() * 0.35)
-        );
-        fwIndex++;
-      }
-
-      fireworks.forEach(fw => {
-        if (!fw.exploded) {
-          fw.y -= fw.speed;
-          fw.trail.push({x: fw.x, y: fw.y, life: 1});
-          fw.trail.forEach(t => {
-            t.life -= 0.04;
-            if (t.life > 0) {
-              ctx.globalAlpha = t.life * 0.6;
-              ctx.fillStyle = fw.colour;
-              ctx.fillRect(t.x - 1, t.y, 2, 4);
-            }
-          });
-          ctx.globalAlpha = 1;
-          ctx.fillStyle = '#fff';
-          ctx.fillRect(fw.x - 2, fw.y - 2, 4, 4);
-          if (fw.y <= fw.targetY) {
-            fw.exploded = true;
-            spawnBurst(fw.x, fw.y, 80, 8);
-          }
-        }
-      });
 
       let alive = false;
       particles.forEach(p => {
         if (p.life <= 0) return;
         alive = true;
         p.x += p.vx; p.y += p.vy;
-        p.vy += 0.1; p.vx *= 0.99;
+        p.vy += 0.08; p.vx *= 0.99;
         p.life -= p.decay;
         p.rotation += p.rotSpeed;
         p.wobble += p.wobbleSpeed;
-        p.x += Math.sin(p.wobble) * 0.5;
+        p.x += Math.sin(p.wobble) * 0.4;
         ctx.save();
         ctx.translate(p.x, p.y);
         ctx.rotate(p.rotation * Math.PI / 180);
         ctx.globalAlpha = Math.max(0, p.life);
         ctx.fillStyle = p.colour;
-        if (p.shape === 'rect') {
-          ctx.fillRect(-p.size/2, -p.size/3, p.size, p.size * 0.5);
-        } else if (p.shape === 'circle') {
-          ctx.beginPath(); ctx.arc(0, 0, p.size/2, 0, Math.PI * 2); ctx.fill();
-        } else if (p.shape === 'star') {
-          drawStar(ctx, p.size/2);
-        } else {
-          ctx.fillRect(-1, -p.size, 2, p.size * 2);
-        }
+        if (p.shape === 'rect') ctx.fillRect(-p.size/2, -p.size/3, p.size, p.size*0.5);
+        else if (p.shape === 'circle') { ctx.beginPath(); ctx.arc(0,0,p.size/2,0,Math.PI*2); ctx.fill(); }
+        else { ctx.beginPath(); for(let i=0;i<5;i++){const a=(i*4*Math.PI)/5-Math.PI/2;ctx[i===0?'moveTo':'lineTo'](Math.cos(a)*p.size/2,Math.sin(a)*p.size/2);} ctx.closePath(); ctx.fill(); }
         ctx.restore();
       });
 
-      if (elapsed > 2000) {
-        if (!bannerShown) bannerShown = true;
-        bannerAlpha = Math.min(1, bannerAlpha + 0.02);
-        bannerScale = Math.min(1, bannerScale + 0.03);
-        const bx = canvas.width / 2;
-        const by = canvas.height * 0.45;
+      // Banner
+      if (elapsed > 1500) {
+        bannerAlpha = Math.min(1, bannerAlpha + 0.025);
+        bannerScale = Math.min(1, bannerScale + 0.035);
+        const bx = canvas.width/2, by = canvas.height*0.45;
         ctx.save();
         ctx.translate(bx, by);
-        const bounce = 1 + Math.sin(elapsed * 0.003) * 0.04;
-        ctx.scale(bannerScale * bounce, bannerScale * bounce);
+        ctx.scale(bannerScale * (1+Math.sin(elapsed*0.003)*0.03), bannerScale * (1+Math.sin(elapsed*0.003)*0.03));
         ctx.globalAlpha = bannerAlpha;
-        const fontSize = Math.min(canvas.width * 0.12, 72);
-        const fontStr = `900 italic ${fontSize}px "Pacifico", "Brush Script MT", "Comic Sans MS", cursive`;
-        ctx.font = fontStr;
+        const fs = Math.min(canvas.width*0.12, 72);
+        ctx.font = `900 italic ${fs}px "Pacifico", cursive`;
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
-        const fullText = 'WELL DONE TEAM!';
-        const singleWidth = ctx.measureText(fullText).width;
-        const maxWidth = canvas.width * 0.85;
-        const lines = singleWidth > maxWidth ? ['WELL DONE', 'TEAM!'] : [fullText];
-        const lineHeight = fontSize * 1.15;
-        const totalH = lines.length * lineHeight;
-        const startY = -(totalH / 2) + lineHeight / 2;
-        function drawLines(fillStyle, offsetY, shadow) {
-          if (shadow) { ctx.shadowColor = '#6bb7e0'; ctx.shadowBlur = 30; }
-          else { ctx.shadowColor = 'transparent'; ctx.shadowBlur = 0; }
-          ctx.fillStyle = fillStyle;
-          lines.forEach((line, i) => {
-            ctx.fillText(line, 0, startY + i * lineHeight + (offsetY || 0));
-          });
-        }
-        drawLines('#3a8dba', 0, true);
-        const grad = ctx.createLinearGradient(-200, -30, 200, 30);
-        grad.addColorStop(0, '#6bb7e0');
-        grad.addColorStop(0.3, '#FFD700');
-        grad.addColorStop(0.6, '#E97132');
-        grad.addColorStop(1, '#6bb7e0');
-        drawLines(grad, 0, false);
-        ctx.globalAlpha = bannerAlpha * 0.4;
-        drawLines('#fff', -2, false);
+        const txt = 'WELL DONE TEAM!';
+        const w = ctx.measureText(txt).width;
+        const lines = w > canvas.width*0.85 ? ['WELL DONE','TEAM!'] : [txt];
+        const lh = fs*1.15;
+        const sy = -(lines.length*lh)/2 + lh/2;
+        // Glow
+        ctx.shadowColor = '#6bb7e0'; ctx.shadowBlur = 30;
+        const g = ctx.createLinearGradient(-200,-30,200,30);
+        g.addColorStop(0,'#6bb7e0'); g.addColorStop(0.4,'#FFD700'); g.addColorStop(0.7,'#E97132'); g.addColorStop(1,'#6bb7e0');
+        ctx.fillStyle = g;
+        lines.forEach((l,i) => ctx.fillText(l, 0, sy+i*lh));
+        ctx.shadowBlur = 0;
+        ctx.globalAlpha = bannerAlpha*0.35;
+        ctx.fillStyle = '#fff';
+        lines.forEach((l,i) => ctx.fillText(l, 0, sy+i*lh-2));
         ctx.restore();
       }
 
-      if (elapsed < 18000 || alive) {
+      if (elapsed < 10000 || alive) {
         requestAnimationFrame(frame);
       } else {
         const fadeOut = () => {
-          ctx.clearRect(0, 0, canvas.width, canvas.height);
+          ctx.clearRect(0,0,canvas.width,canvas.height);
           bannerAlpha -= 0.03;
           if (bannerAlpha > 0) {
-            const bx = canvas.width / 2;
-            const by = canvas.height * 0.45;
-            const fontSize = Math.min(canvas.width * 0.12, 72);
-            ctx.save();
-            ctx.translate(bx, by);
-            ctx.globalAlpha = bannerAlpha;
-            ctx.font = `900 italic ${fontSize}px "Pacifico", "Brush Script MT", "Comic Sans MS", cursive`;
-            ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-            const fullText = 'WELL DONE TEAM!';
-            const singleWidth = ctx.measureText(fullText).width;
-            const maxWidth = canvas.width * 0.85;
-            const lines = singleWidth > maxWidth ? ['WELL DONE', 'TEAM!'] : [fullText];
-            const lineHeight = fontSize * 1.15;
-            const totalH = lines.length * lineHeight;
-            const startY = -(totalH / 2) + lineHeight / 2;
-            ctx.shadowColor = '#6bb7e0'; ctx.shadowBlur = 30;
-            const grad = ctx.createLinearGradient(-200, -30, 200, 30);
-            grad.addColorStop(0, '#6bb7e0');
-            grad.addColorStop(0.3, '#FFD700');
-            grad.addColorStop(0.6, '#E97132');
-            grad.addColorStop(1, '#6bb7e0');
-            ctx.fillStyle = grad;
-            lines.forEach((line, i) => {
-              ctx.fillText(line, 0, startY + i * lineHeight);
-            });
+            const bx=canvas.width/2, by=canvas.height*0.45;
+            const fs = Math.min(canvas.width*0.12,72);
+            ctx.save(); ctx.translate(bx,by); ctx.globalAlpha=bannerAlpha;
+            ctx.font=`900 italic ${fs}px "Pacifico",cursive`;
+            ctx.textAlign='center'; ctx.textBaseline='middle';
+            const txt='WELL DONE TEAM!';
+            const w=ctx.measureText(txt).width;
+            const lines=w>canvas.width*0.85?['WELL DONE','TEAM!']:[txt];
+            const lh=fs*1.15, sy=-(lines.length*lh)/2+lh/2;
+            ctx.shadowColor='#6bb7e0'; ctx.shadowBlur=30;
+            const g=ctx.createLinearGradient(-200,-30,200,30);
+            g.addColorStop(0,'#6bb7e0'); g.addColorStop(0.4,'#FFD700'); g.addColorStop(0.7,'#E97132'); g.addColorStop(1,'#6bb7e0');
+            ctx.fillStyle=g;
+            lines.forEach((l,i) => ctx.fillText(l,0,sy+i*lh));
             ctx.restore();
             requestAnimationFrame(fadeOut);
-          } else {
-            canvas.remove();
-          }
+          } else canvas.remove();
         };
         requestAnimationFrame(fadeOut);
       }
     }
-
-    const link = document.createElement('link');
-    link.href = 'https://fonts.googleapis.com/css2?family=Pacifico&display=swap';
-    link.rel = 'stylesheet';
-    document.head.appendChild(link);
     requestAnimationFrame(frame);
   }
 
-  // ── Listen for real-time updates from Firebase ──
+  // ── Tick/untick sounds ──
+  function playTick(isBoat) {
+    const ac = getAudioCtx(); const now = ac.currentTime;
+    const o1 = ac.createOscillator(), o2 = ac.createOscillator(), g = ac.createGain();
+    o1.connect(g); o2.connect(g); g.connect(ac.destination);
+    if (isBoat) {
+      o1.type='sine'; o1.frequency.setValueAtTime(1047,now); o1.frequency.setValueAtTime(1319,now+0.08);
+      o2.type='sine'; o2.frequency.setValueAtTime(1568,now+0.06);
+      g.gain.setValueAtTime(0.12,now); g.gain.exponentialRampToValueAtTime(0.001,now+0.25);
+    } else {
+      o1.type='triangle'; o1.frequency.setValueAtTime(784,now);
+      o2.type='triangle'; o2.frequency.setValueAtTime(988,now+0.05);
+      g.gain.setValueAtTime(0.1,now); g.gain.exponentialRampToValueAtTime(0.001,now+0.18);
+    }
+    o1.start(now); o2.start(now); o1.stop(now+0.3); o2.stop(now+0.3);
+  }
+  function playUntick() {
+    const ac = getAudioCtx(); const now = ac.currentTime;
+    const o = ac.createOscillator(), g = ac.createGain();
+    o.connect(g); g.connect(ac.destination);
+    o.type='sine'; o.frequency.setValueAtTime(659,now); o.frequency.exponentialRampToValueAtTime(262,now+0.25);
+    g.gain.setValueAtTime(0.08,now); g.gain.exponentialRampToValueAtTime(0.001,now+0.3);
+    o.start(now); o.stop(now+0.35);
+  }
+
+  // ── Visual FX ──
+  const miniColours = ['#6bb7e0','#E97132','#2ecc71','#FFD700','#FF69B4','#b8ddf0'];
+  function spawnRipple(btn) {
+    const r = document.createElement('div'); r.className='ripple-ring';
+    btn.appendChild(r); r.addEventListener('animationend',()=>r.remove());
+  }
+  function spawnMiniConfetti(btn) {
+    for (let i=0;i<5;i++) {
+      const p = document.createElement('div'); p.className='mini-confetti';
+      p.style.background = miniColours[Math.floor(Math.random()*miniColours.length)];
+      const a=(Math.PI*2*i)/5+(Math.random()-0.5)*0.5, d=18+Math.random()*14;
+      p.style.setProperty('--mx',Math.cos(a)*d+'px');
+      p.style.setProperty('--my',Math.sin(a)*d+'px');
+      p.style.setProperty('--mr',(Math.random()*360)+'deg');
+      p.style.left='50%'; p.style.top='50%';
+      btn.appendChild(p); p.addEventListener('animationend',()=>p.remove());
+    }
+  }
+
+  // ── Firebase listener ──
   db.on('value', function(snapshot) {
     const state = snapshot.val() || {};
     allItems.forEach(el => {
-      const id = el.dataset.id;
-      if (state[id]) {
-        el.classList.add('loaded');
-      } else {
-        el.classList.remove('loaded');
-      }
+      if (state[el.dataset.id]) el.classList.add('loaded');
+      else el.classList.remove('loaded');
     });
     refresh();
   });
 
-  function playTick(isBoat) {
-    const ctx = getAudioCtx();
-    const now = ctx.currentTime;
-    const osc1 = ctx.createOscillator();
-    const osc2 = ctx.createOscillator();
-    const gain = ctx.createGain();
-
-    osc1.connect(gain);
-    osc2.connect(gain);
-    gain.connect(ctx.destination);
-
-    if (isBoat) {
-      // Boat: bright two-note chime (C6 → E6)
-      osc1.type = 'sine';
-      osc1.frequency.setValueAtTime(1047, now);
-      osc1.frequency.setValueAtTime(1319, now + 0.08);
-      osc2.type = 'sine';
-      osc2.frequency.setValueAtTime(1568, now + 0.06);
-      gain.gain.setValueAtTime(0.15, now);
-      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.25);
-    } else {
-      // Equipment: softer woodblock pop (G5 → B5)
-      osc1.type = 'triangle';
-      osc1.frequency.setValueAtTime(784, now);
-      osc2.type = 'triangle';
-      osc2.frequency.setValueAtTime(988, now + 0.05);
-      gain.gain.setValueAtTime(0.12, now);
-      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.18);
-    }
-
-    osc1.start(now);
-    osc2.start(now);
-    osc1.stop(now + 0.3);
-    osc2.stop(now + 0.3);
-  }
-
-  function playUntick() {
-    const ctx = getAudioCtx();
-    const now = ctx.currentTime;
-    const osc = ctx.createOscillator();
-    const gain = ctx.createGain();
-    osc.connect(gain);
-    gain.connect(ctx.destination);
-
-    // Sad descending tone (E5 → C4)
-    osc.type = 'sine';
-    osc.frequency.setValueAtTime(659, now);
-    osc.frequency.exponentialRampToValueAtTime(262, now + 0.25);
-    gain.gain.setValueAtTime(0.1, now);
-    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.3);
-
-    osc.start(now);
-    osc.stop(now + 0.35);
-  }
-
-  // ── Visual effects ──
-  const miniColours = ['#6bb7e0','#E97132','#196B24','#FFD700','#A02B93','#FF69B4'];
-
-  function spawnRipple(btn) {
-    const ring = document.createElement('div');
-    ring.className = 'ripple-ring';
-    btn.appendChild(ring);
-    ring.addEventListener('animationend', () => ring.remove());
-  }
-
-  function spawnMiniConfetti(btn) {
-    for (let i = 0; i < 5; i++) {
-      const p = document.createElement('div');
-      p.className = 'mini-confetti';
-      p.style.background = miniColours[Math.floor(Math.random() * miniColours.length)];
-      const angle = (Math.PI * 2 * i) / 5 + (Math.random() - 0.5) * 0.5;
-      const dist = 18 + Math.random() * 14;
-      p.style.setProperty('--mx', Math.cos(angle) * dist + 'px');
-      p.style.setProperty('--my', Math.sin(angle) * dist + 'px');
-      p.style.setProperty('--mr', (Math.random() * 360) + 'deg');
-      p.style.left = '50%';
-      p.style.top = '50%';
-      btn.appendChild(p);
-      p.addEventListener('animationend', () => p.remove());
-    }
-  }
-
-  // ── Click handler ──
+  // ── Click ──
   allItems.forEach(el => {
     el.addEventListener('click', function() {
       const id = el.dataset.id;
       const isLoaded = !el.classList.contains('loaded');
       const isBoat = el.classList.contains('boat-slot');
       const btn = el.querySelector('.load-btn');
-
       el.classList.toggle('loaded');
       refresh();
       db.child(id).set(isLoaded ? true : null);
-
-      if (isLoaded) {
-        playTick(isBoat);
-        spawnRipple(btn);
-        spawnMiniConfetti(btn);
-      } else {
-        playUntick();
-      }
+      if (isLoaded) { playTick(isBoat); spawnRipple(btn); spawnMiniConfetti(btn); }
+      else playUntick();
     });
   });
 
@@ -1194,6 +1037,5 @@
   });
 })();
 </script>
-
 </body>
 </html>
