@@ -24,16 +24,15 @@
       overflow: hidden;
     }
 
-    .hero {
-      height: 100vh;
-      width: 100%;
-      background: url("4+canal.jpg") no-repeat center center / cover;
-      position: relative;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      text-align: center;
-    }
+   .hero {
+  height: 100vh;
+  width: 100%;
+  background: url("4+canal.jpg") no-repeat center center / cover;
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+}
 
     /* Warm heritage overlay */
     .hero::before {
@@ -44,11 +43,13 @@
     }
 
     .content {
-      position: relative;
-      z-index: 1;
-      padding: 20px;
-      transform: translateY(-3vh);
-    }
+  position: absolute;
+  top: 62%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 1;
+  text-align: center;
+}
 
     h1 {
       font-size: clamp(3rem, 9vw, 7rem);
