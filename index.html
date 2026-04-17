@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Meggetland</title>
+
   <link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:wght@400;700&display=swap" rel="stylesheet">
 
   <style>
@@ -20,6 +21,7 @@
     body {
       font-family: "Libre Baskerville", Georgia, "Times New Roman", serif;
       color: #f5f2ec;
+      overflow: hidden;
     }
 
     .hero {
@@ -33,50 +35,104 @@
       text-align: center;
     }
 
+    /* Warm heritage overlay */
     .hero::before {
       content: "";
       position: absolute;
       inset: 0;
-      background: rgba(35, 30, 25, 0.55);
+      background: rgba(35, 30, 25, 0.6);
     }
 
     .content {
       position: relative;
       z-index: 1;
       padding: 20px;
-      max-width: 800px;
+      transform: translateY(-3vh);
     }
 
     h1 {
-      font-size: clamp(2.5rem, 6vw, 4.5rem);
+      font-size: clamp(3rem, 9vw, 7rem);
       font-weight: 700;
-      letter-spacing: -0.02em;
+      letter-spacing: 0.02em;
+      line-height: 0.95;
     }
 
     .divider {
-      width: 60px;
+      width: 70px;
       height: 1px;
-      background: rgba(245, 242, 236, 0.6);
-      margin: 1.5rem auto 0;
+      background: rgba(245, 242, 236, 0.7);
+      margin: 1.75rem auto 0;
     }
 
     p {
-      margin-top: 1.25rem;
-      font-size: clamp(1rem, 2vw, 1.3rem);
-      opacity: 0.85;
+      margin-top: 1.6rem;
+      font-size: clamp(1.1rem, 2.5vw, 2rem);
       letter-spacing: 0.1em;
+      opacity: 0.9;
       text-transform: lowercase;
+    }
+
+    /* Bottom link */
+    .footer-link {
+      position: absolute;
+      left: 50%;
+      bottom: 2rem;
+      transform: translateX(-50%);
+      z-index: 1;
+
+      font-size: 0.75rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+
+      color: rgba(245, 242, 236, 0.6);
+      text-decoration: none;
+
+      opacity: 0;
+      animation: fadeIn 2s ease 1.5s forwards;
+    }
+
+    .footer-link::after {
+      content: "";
+      display: block;
+      width: 0;
+      height: 1px;
+      background: rgba(245, 242, 236, 0.6);
+      margin-top: 6px;
+      transition: width 0.3s ease;
+    }
+
+    .footer-link:hover {
+      color: rgba(245, 242, 236, 0.9);
+    }
+
+    .footer-link:hover::after {
+      width: 100%;
+    }
+
+    @keyframes fadeIn {
+      to {
+        opacity: 1;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .footer-link {
+        bottom: 1.5rem;
+        font-size: 0.7rem;
+      }
     }
   </style>
 </head>
+
 <body>
   <div class="hero">
     <div class="content">
       <h1>Meggetland</h1>
       <div class="divider"></div>
       <p>check back soon</p>
-      <a href="https://www.meggetland.com/trailer/">view trailer</a>
     </div>
+
+    <a class="footer-link" href="https://www.meggetland.com/trailer/">See the BUCS trailer plan</a>
   </div>
 </body>
 </html>
