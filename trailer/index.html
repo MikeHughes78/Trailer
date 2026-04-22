@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>EUBC BUCS trailer plan</title>
+<title>EUBC Trailer Loading Plan — BUCS Regatta 2026</title>
 <link href="https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@300;400;600;700&family=SF+Pro+Text:wght@400;500;600&family=JetBrains+Mono:wght@500;700&family=Pacifico&display=swap" rel="stylesheet">
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
@@ -474,6 +474,136 @@
     100% { transform: translate(var(--mx), var(--my)) scale(0) rotate(var(--mr)); opacity: 0; }
   }
 
+  /* ═══ RIGGER CHECKLIST ═══ */
+  .rigger-section {
+    margin-bottom: 24px;
+  }
+  .rigger-section h2 {
+    font-size: 0.82rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--baby-blue-dark);
+    margin-bottom: 12px;
+    padding-left: 4px;
+  }
+  .rigger-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 14px;
+  }
+  .rigger-card {
+    padding: 14px 14px 10px;
+    position: relative;
+    overflow: hidden;
+  }
+  .rigger-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--orange), #f0a070);
+    border-radius: 16px 16px 0 0;
+  }
+  .rigger-card h3 {
+    font-size: 0.68rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--orange);
+    margin-bottom: 8px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid rgba(233,113,50,0.15);
+  }
+  .rigger-row {
+    display: grid;
+    grid-template-columns: 1fr 60px 60px;
+    align-items: center;
+    padding: 5px 2px;
+    border-radius: 6px;
+    gap: 4px;
+  }
+  .rigger-row:not(:last-child) {
+    border-bottom: 1px solid rgba(0,0,0,0.04);
+  }
+  .rigger-row .r-name {
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--text);
+  }
+  .rigger-col-header {
+    display: grid;
+    grid-template-columns: 1fr 60px 60px;
+    padding: 0 2px 6px;
+    margin-bottom: 4px;
+    border-bottom: 1px solid rgba(0,0,0,0.08);
+    gap: 4px;
+  }
+  .rigger-col-header span {
+    font-size: 0.62rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-secondary);
+    text-align: center;
+  }
+  .rigger-col-header span:first-child {
+    text-align: left;
+  }
+  .r-cell {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  /* Active rigger button — starts red, NO tick. Tick only appears when done (green) */
+  .rigger-btn {
+    width: 24px; height: 24px;
+    border-radius: 6px;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    line-height: 1;
+    padding: 0;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: visible;
+    color: transparent;
+    background: linear-gradient(135deg, #e74c3c, #c0392b);
+    box-shadow: 0 2px 6px rgba(231,76,60,0.25);
+  }
+  .rigger-btn:hover {
+    transform: scale(1.1);
+    box-shadow: 0 3px 10px rgba(231,76,60,0.35);
+  }
+  .rigger-btn.done {
+    background: linear-gradient(135deg, var(--btn-done), var(--btn-done-dark));
+    box-shadow: 0 2px 6px rgba(46,204,113,0.3);
+    color: #fff;
+  }
+  .rigger-btn.done::after {
+    content: '✓';
+  }
+  .rigger-btn.done:hover {
+    box-shadow: 0 3px 10px rgba(46,204,113,0.4);
+  }
+  /* Grey/disabled rigger — not needed */
+  .rigger-btn.na {
+    background: rgba(0,0,0,0.06);
+    box-shadow: none;
+    cursor: default;
+    color: rgba(0,0,0,0.15);
+    pointer-events: none;
+  }
+
+  /* Single-column rigger layout (singles = scull only, eights = sweep only) */
+  .rigger-col-header.rigger-1col,
+  .rigger-row.rigger-1col {
+    grid-template-columns: 1fr 60px;
+  }
+
   /* ═══ EQUIPMENT CHECKLIST ═══ */
   .checklist-section {
     margin-bottom: 22px;
@@ -638,15 +768,15 @@
 
   <!-- Header -->
   <div class="header glass">
-    <h1><span class="blue">EUBC</span> BUCS trailer plan</h1>
-    <p>Long press to load/unload a boat</p>
+    <h1><span class="blue">EUBC</span> Trailer Loading Plan</h1>
+    <p>BUCS Regatta 2026 · Tap each item when loaded</p>
   </div>
 
   <!-- Progress -->
   <div class="progress-section glass">
     <div class="progress-label">
       <span>Loading progress</span>
-      <span><strong id="loadedCount">0</strong> / <span id="totalCount">53</span></span>
+      <span><strong id="loadedCount">0</strong> / <span id="totalCount">82</span></span>
     </div>
     <div class="progress-track">
       <div class="progress-fill" id="progressFill"></div>
@@ -736,6 +866,63 @@
     </div>
   </div>
 
+  <!-- Rigger Checklist -->
+  <div class="rigger-section">
+    <h2>Rigger Checklist</h2>
+    <div class="rigger-grid">
+
+      <div class="rigger-card glass-subtle">
+        <h3>Singles</h3>
+        <div class="rigger-col-header rigger-1col"><span>Boat</span><span>Scull</span></div>
+        <div class="rigger-row rigger-1col"><span class="r-name">EHU170</span><div class="r-cell"><button class="rigger-btn" data-id="rig-ehu170-scull"></button></div></div>
+        <div class="rigger-row rigger-1col"><span class="r-name">EHU171</span><div class="r-cell"><button class="rigger-btn" data-id="rig-ehu171-scull"></button></div></div>
+        <div class="rigger-row rigger-1col"><span class="r-name">EHU173</span><div class="r-cell"><button class="rigger-btn" data-id="rig-ehu173-scull"></button></div></div>
+        <div class="rigger-row rigger-1col"><span class="r-name">EHU174</span><div class="r-cell"><button class="rigger-btn" data-id="rig-ehu174-scull"></button></div></div>
+        <div class="rigger-row rigger-1col"><span class="r-name">EHU192</span><div class="r-cell"><button class="rigger-btn" data-id="rig-ehu192-scull"></button></div></div>
+        <div class="rigger-row rigger-1col"><span class="r-name">Matthews</span><div class="r-cell"><button class="rigger-btn" data-id="rig-matthews-scull"></button></div></div>
+        <div class="rigger-row rigger-1col"><span class="r-name">Plank</span><div class="r-cell"><button class="rigger-btn" data-id="rig-plank-scull"></button></div></div>
+      </div>
+
+      <div class="rigger-card glass-subtle">
+        <h3>Doubles / Pairs</h3>
+        <div class="rigger-col-header"><span>Boat</span><span>Sweep</span><span>Scull</span></div>
+        <div class="rigger-row"><span class="r-name">EHU270</span><div class="r-cell"><button class="rigger-btn na">—</button></div><div class="r-cell"><button class="rigger-btn" data-id="rig-ehu270-scull"></button></div></div>
+        <div class="rigger-row"><span class="r-name">EHU271</span><div class="r-cell"><button class="rigger-btn" data-id="rig-ehu271-sweep"></button></div><div class="r-cell"><button class="rigger-btn" data-id="rig-ehu271-scull"></button></div></div>
+        <div class="rigger-row"><span class="r-name">EHU280</span><div class="r-cell"><button class="rigger-btn" data-id="rig-ehu280-sweep"></button></div><div class="r-cell"><button class="rigger-btn" data-id="rig-ehu280-scull"></button></div></div>
+        <div class="rigger-row"><span class="r-name">EHU282</span><div class="r-cell"><button class="rigger-btn na">—</button></div><div class="r-cell"><button class="rigger-btn" data-id="rig-ehu282-scull"></button></div></div>
+        <div class="rigger-row"><span class="r-name">EHU283</span><div class="r-cell"><button class="rigger-btn" data-id="rig-ehu283-sweep"></button></div><div class="r-cell"><button class="rigger-btn" data-id="rig-ehu283-scull"></button></div></div>
+        <div class="rigger-row"><span class="r-name">EHU284</span><div class="r-cell"><button class="rigger-btn" data-id="rig-ehu284-sweep"></button></div><div class="r-cell"><button class="rigger-btn na">—</button></div></div>
+        <div class="rigger-row"><span class="r-name">EHU290</span><div class="r-cell"><button class="rigger-btn na">—</button></div><div class="r-cell"><button class="rigger-btn" data-id="rig-ehu290-scull"></button></div></div>
+        <div class="rigger-row"><span class="r-name">EHU291</span><div class="r-cell"><button class="rigger-btn" data-id="rig-ehu291-sweep"></button></div><div class="r-cell"><button class="rigger-btn" data-id="rig-ehu291-scull"></button></div></div>
+        <div class="rigger-row"><span class="r-name">EHU292</span><div class="r-cell"><button class="rigger-btn na">—</button></div><div class="r-cell"><button class="rigger-btn" data-id="rig-ehu292-scull"></button></div></div>
+      </div>
+
+      <div class="rigger-card glass-subtle">
+        <h3>Fours / Quads</h3>
+        <div class="rigger-col-header"><span>Boat</span><span>Sweep</span><span>Scull</span></div>
+        <div class="rigger-row"><span class="r-name">EHU470</span><div class="r-cell"><button class="rigger-btn na">—</button></div><div class="r-cell"><button class="rigger-btn" data-id="rig-ehu470-scull"></button></div></div>
+        <div class="rigger-row"><span class="r-name">EHU471</span><div class="r-cell"><button class="rigger-btn na">—</button></div><div class="r-cell"><button class="rigger-btn" data-id="rig-ehu471-scull"></button></div></div>
+        <div class="rigger-row"><span class="r-name">EHU472</span><div class="r-cell"><button class="rigger-btn" data-id="rig-ehu472-sweep"></button></div><div class="r-cell"><button class="rigger-btn" data-id="rig-ehu472-scull"></button></div></div>
+        <div class="rigger-row"><span class="r-name">EHU480</span><div class="r-cell"><button class="rigger-btn na">—</button></div><div class="r-cell"><button class="rigger-btn" data-id="rig-ehu480-scull"></button></div></div>
+        <div class="rigger-row"><span class="r-name">EHU490</span><div class="r-cell"><button class="rigger-btn" data-id="rig-ehu490-sweep"></button></div><div class="r-cell"><button class="rigger-btn" data-id="rig-ehu490-scull"></button></div></div>
+        <div class="rigger-row"><span class="r-name">Sarju</span><div class="r-cell"><button class="rigger-btn" data-id="rig-sarju-sweep"></button></div><div class="r-cell"><button class="rigger-btn na">—</button></div></div>
+        <div class="rigger-row"><span class="r-name">Ronan</span><div class="r-cell"><button class="rigger-btn" data-id="rig-ronan-sweep"></button></div><div class="r-cell"><button class="rigger-btn na">—</button></div></div>
+        <div class="rigger-row"><span class="r-name">EHU591</span><div class="r-cell"><button class="rigger-btn" data-id="rig-ehu591-sweep"></button></div><div class="r-cell"><button class="rigger-btn na">—</button></div></div>
+      </div>
+
+      <div class="rigger-card glass-subtle">
+        <h3>Eights</h3>
+        <div class="rigger-col-header rigger-1col"><span>Boat</span><span>Sweep</span></div>
+        <div class="rigger-row rigger-1col"><span class="r-name">KGII</span><div class="r-cell"><button class="rigger-btn" data-id="rig-kgii-sweep"></button></div></div>
+        <div class="rigger-row rigger-1col"><span class="r-name">Phil McNaul</span><div class="r-cell"><button class="rigger-btn" data-id="rig-philmcnaul-sweep"></button></div></div>
+        <div class="rigger-row rigger-1col"><span class="r-name">Hugh Edminston</span><div class="r-cell"><button class="rigger-btn" data-id="rig-hughedminston-sweep"></button></div></div>
+        <div class="rigger-row rigger-1col"><span class="r-name">New W USP</span><div class="r-cell"><button class="rigger-btn" data-id="rig-newwusp-sweep"></button></div></div>
+        <div class="rigger-row rigger-1col"><span class="r-name">Jim Aitken</span><div class="r-cell"><button class="rigger-btn" data-id="rig-jimaitken-sweep"></button></div></div>
+      </div>
+
+    </div>
+  </div>
+
   <!-- Equipment Checklist -->
   <div class="checklist-section">
     <h2>Oars &amp; Equipment</h2>
@@ -800,7 +987,8 @@
   });
   const db = firebase.database().ref('trailer-state-v2');
   const allItems = document.querySelectorAll('.boat-slot, .checklist-card .item');
-  const totalCount = allItems.length;
+  const riggerBtns = document.querySelectorAll('.rigger-btn[data-id]'); // active rigger buttons only (not .na)
+  const totalCount = allItems.length + riggerBtns.length;
   document.getElementById('totalCount').textContent = totalCount;
 
   // ── Audio ──
@@ -815,7 +1003,8 @@
   let previousLoaded = 0;
 
   function refresh() {
-    const n = document.querySelectorAll('.boat-slot.loaded, .checklist-card .item.loaded').length;
+    const n = document.querySelectorAll('.boat-slot.loaded, .checklist-card .item.loaded').length
+      + document.querySelectorAll('.rigger-btn.done').length;
     document.getElementById('loadedCount').textContent = n;
     document.getElementById('progressFill').style.width = ((n / totalCount) * 100) + '%';
     if (n === totalCount && previousLoaded < totalCount) celebrate();
@@ -1104,6 +1293,10 @@
       if (state[el.dataset.id]) el.classList.add('loaded');
       else el.classList.remove('loaded');
     });
+    riggerBtns.forEach(btn => {
+      if (state[btn.dataset.id]) btn.classList.add('done');
+      else btn.classList.remove('done');
+    });
     refresh();
   });
 
@@ -1259,6 +1452,69 @@
     // Prevent default click and context menu
     el.addEventListener('click', e => e.preventDefault());
     el.addEventListener('contextmenu', e => e.preventDefault());
+  });
+
+  // ── Long-press handler for rigger buttons ──
+  riggerBtns.forEach(btn => {
+    let pressTimer = null;
+    let pulse = null;
+    let pressTone = null;
+    let sonarInterval = null;
+    let startX = 0, startY = 0;
+
+    function startPress(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      const touch = e.touches ? e.touches[0] : e;
+      startX = touch.clientX;
+      startY = touch.clientY;
+
+      const isDone = btn.classList.contains('done');
+      pulse = createPulse(btn);
+      requestAnimationFrame(() => {
+        pulse.classList.add(isDone ? 'unloading' : 'filling');
+      });
+
+      spawnSonar(btn, isDone);
+      sonarInterval = setInterval(() => spawnSonar(btn, isDone), 200);
+      pressTone = isDone ? startFallingTone() : startRisingTone();
+
+      pressTimer = setTimeout(() => {
+        stopPressTone(pressTone); pressTone = null;
+        clearInterval(sonarInterval); sonarInterval = null;
+        const id = btn.dataset.id;
+        const willDone = !btn.classList.contains('done');
+        btn.classList.toggle('done');
+        refresh();
+        db.child(id).set(willDone ? true : null);
+        if (willDone) { playTick(false); spawnRipple(btn); spawnMiniConfetti(btn); }
+        else playUntick();
+        if (pulse) { pulse.remove(); pulse = null; }
+      }, HOLD_MS);
+    }
+
+    function cancelPress() {
+      if (pressTimer) { clearTimeout(pressTimer); pressTimer = null; }
+      if (sonarInterval) { clearInterval(sonarInterval); sonarInterval = null; }
+      stopPressTone(pressTone); pressTone = null;
+      if (pulse) { pulse.remove(); pulse = null; }
+    }
+
+    function moveCheck(e) {
+      if (!pressTimer) return;
+      const touch = e.touches ? e.touches[0] : e;
+      if (Math.abs(touch.clientX-startX)>10 || Math.abs(touch.clientY-startY)>10) cancelPress();
+    }
+
+    btn.addEventListener('touchstart', startPress, { passive: false });
+    btn.addEventListener('touchend', cancelPress);
+    btn.addEventListener('touchcancel', cancelPress);
+    btn.addEventListener('touchmove', moveCheck, { passive: true });
+    btn.addEventListener('mousedown', startPress);
+    btn.addEventListener('mouseup', cancelPress);
+    btn.addEventListener('mouseleave', cancelPress);
+    btn.addEventListener('click', e => e.preventDefault());
+    btn.addEventListener('contextmenu', e => e.preventDefault());
   });
 
   document.getElementById('resetBtn').addEventListener('click', function() {
