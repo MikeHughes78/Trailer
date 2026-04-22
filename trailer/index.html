@@ -1069,14 +1069,62 @@
     return ring;
   }
 
+  // Rising tone during press (loading)
+  function startRisingTone() {
+    const ac = getAudioCtx();
+    const now = ac.currentTime;
+    const o = ac.createOscillator();
+    const g = ac.createGain();
+    o.type = 'sine';
+    // Rise from C5 to B5 over the hold duration
+    o.frequency.setValueAtTime(523, now);
+    o.frequency.exponentialRampToValueAtTime(988, now + HOLD_MS / 1000);
+    g.gain.setValueAtTime(0.06, now);
+    g.gain.linearRampToValueAtTime(0.1, now + HOLD_MS / 1000);
+    o.connect(g);
+    g.connect(ac.destination);
+    o.start(now);
+    return { osc: o, gain: g };
+  }
+
+  // Falling tone during press (unloading)
+  function startFallingTone() {
+    const ac = getAudioCtx();
+    const now = ac.currentTime;
+    const o = ac.createOscillator();
+    const g = ac.createGain();
+    o.type = 'sine';
+    // Fall from G5 to C4 over the hold duration
+    o.frequency.setValueAtTime(784, now);
+    o.frequency.exponentialRampToValueAtTime(262, now + HOLD_MS / 1000);
+    g.gain.setValueAtTime(0.06, now);
+    g.gain.linearRampToValueAtTime(0.08, now + HOLD_MS / 1000);
+    o.connect(g);
+    g.connect(ac.destination);
+    o.start(now);
+    return { osc: o, gain: g };
+  }
+
+  // Stop the press tone (fade out quickly)
+  function stopPressTone(tone) {
+    if (!tone) return;
+    try {
+      const ac = getAudioCtx();
+      tone.gain.gain.cancelScheduledValues(ac.currentTime);
+      tone.gain.gain.setValueAtTime(tone.gain.gain.value, ac.currentTime);
+      tone.gain.gain.exponentialRampToValueAtTime(0.001, ac.currentTime + 0.05);
+      tone.osc.stop(ac.currentTime + 0.06);
+    } catch(e) {}
+  }
+
   allItems.forEach(el => {
     let pressTimer = null;
     let ring = null;
+    let pressTone = null;
     let startX = 0, startY = 0;
     const MOVE_THRESHOLD = 10;
 
     function startPress(e) {
-      // Prevent context menu on long press
       e.preventDefault();
       const touch = e.touches ? e.touches[0] : e;
       startX = touch.clientX;
@@ -1092,7 +1140,14 @@
       });
       el.classList.add('pressing');
 
+      // Start the continuous tone
+      pressTone = isLoaded ? startFallingTone() : startRisingTone();
+
       pressTimer = setTimeout(() => {
+        // Rising/falling tone completed — stop it
+        stopPressTone(pressTone);
+        pressTone = null;
+
         // Long press complete — toggle the item
         const id = el.dataset.id;
         const willLoad = !el.classList.contains('loaded');
@@ -1103,6 +1158,7 @@
         refresh();
         db.child(id).set(willLoad ? true : null);
 
+        // Play the completion sound (continues naturally from the rising/falling tone)
         if (willLoad) {
           playTick(isBoat);
           spawnRipple(btn);
@@ -1120,6 +1176,9 @@
         clearTimeout(pressTimer);
         pressTimer = null;
       }
+      // Stop the tone if they released early
+      stopPressTone(pressTone);
+      pressTone = null;
       el.classList.remove('pressing');
       cleanupRing();
     }
