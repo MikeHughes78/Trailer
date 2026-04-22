@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>EUBC Trailer Loading Plan — BUCS Regatta 2026</title>
+<title>EUBC BUCS trailer plan/title>
 <link href="https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@300;400;600;700&family=SF+Pro+Text:wght@400;500;600&family=JetBrains+Mono:wght@500;700&family=Pacifico&display=swap" rel="stylesheet">
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
@@ -322,10 +322,9 @@
   .load-btn {
     width: 22px; height: 22px; min-width: 22px;
     border-radius: 7px;
-    border: 2px solid rgba(107,183,224,0.4);
-    background: rgba(255,255,255,0.5);
-    backdrop-filter: blur(4px);
-    -webkit-backdrop-filter: blur(4px);
+    border: none;
+    background: linear-gradient(135deg, #e74c3c, #c0392b);
+    box-shadow: 0 2px 6px rgba(231,76,60,0.25);
     cursor: pointer;
     display: flex;
     align-items: center;
@@ -340,16 +339,22 @@
     overflow: visible;
   }
   .load-btn:hover {
-    border-color: var(--btn-done);
-    background: rgba(46,204,113,0.1);
     transform: scale(1.1);
+    box-shadow: 0 3px 10px rgba(231,76,60,0.35);
   }
   .boat-slot.loaded .load-btn,
   .item.loaded .load-btn {
-    border-color: var(--btn-done);
     background: linear-gradient(135deg, var(--btn-done), var(--btn-done-dark));
-    color: #fff;
     box-shadow: 0 2px 8px rgba(46,204,113,0.3);
+    color: #fff;
+  }
+  .boat-slot.loaded .load-btn::after,
+  .item.loaded .load-btn::after {
+    content: '✓';
+  }
+  .boat-slot.loaded .load-btn:hover,
+  .item.loaded .load-btn:hover {
+    box-shadow: 0 3px 10px rgba(46,204,113,0.4);
   }
 
   /* Long-press radiating pulse — large enough to see past a finger */
@@ -392,12 +397,13 @@
   }
 
   /* Unloading: red expanding */
+  /* Unloading: red CONTRACTING */
   .press-pulse.unloading::before {
-    animation: pulse-ring-out 0.6s linear forwards;
+    animation: pulse-ring-in 0.6s linear forwards;
     border-color: var(--safety-red);
   }
   .press-pulse.unloading::after {
-    animation: pulse-glow 0.6s ease-out forwards;
+    animation: pulse-glow-in 0.6s ease-out forwards;
     background: radial-gradient(circle, rgba(231,76,60,0.2) 0%, transparent 70%);
   }
 
@@ -406,32 +412,50 @@
     60% { opacity: 0.6; }
     100% { transform: scale(1); opacity: 0.3; }
   }
+  @keyframes pulse-ring-in {
+    0% { transform: scale(1.2); opacity: 0.3; }
+    40% { opacity: 0.6; }
+    100% { transform: scale(0.2); opacity: 0.8; }
+  }
   @keyframes pulse-glow {
     0% { transform: scale(0.3); opacity: 0; }
     30% { opacity: 0.8; }
     100% { transform: scale(1.2); opacity: 0.5; }
+  }
+  @keyframes pulse-glow-in {
+    0% { transform: scale(1.5); opacity: 0.5; }
+    70% { opacity: 0.7; }
+    100% { transform: scale(0.3); opacity: 0; }
   }
 
   /* Repeating sonar rings during hold */
   .sonar-ring {
     position: absolute;
     top: 50%; left: 50%;
-    transform: translate(-50%, -50%) scale(0);
-    width: 100px; height: 100px;
     border-radius: 50%;
     pointer-events: none;
     z-index: 4;
-    animation: sonar 0.8s ease-out forwards;
   }
   .sonar-ring.load-sonar {
+    width: 100px; height: 100px;
     border: 1.5px solid rgba(46,204,113,0.5);
+    transform: translate(-50%, -50%) scale(0);
+    animation: sonar-out 0.8s ease-out forwards;
   }
   .sonar-ring.unload-sonar {
+    width: 100px; height: 100px;
     border: 1.5px solid rgba(231,76,60,0.4);
+    transform: translate(-50%, -50%) scale(1.8);
+    animation: sonar-in 0.8s ease-in forwards;
   }
-  @keyframes sonar {
+  @keyframes sonar-out {
     0% { transform: translate(-50%, -50%) scale(0.3); opacity: 0.7; }
     100% { transform: translate(-50%, -50%) scale(1.8); opacity: 0; }
+  }
+  @keyframes sonar-in {
+    0% { transform: translate(-50%, -50%) scale(1.8); opacity: 0; }
+    30% { opacity: 0.6; }
+    100% { transform: translate(-50%, -50%) scale(0.2); opacity: 0; }
   }
 
   /* Pressing state — whole row highlights */
@@ -768,14 +792,14 @@
 
   <!-- Header -->
   <div class="header glass">
-    <h1><span class="blue">EUBC</span> Trailer Loading Plan</h1>
-    <p>BUCS Regatta 2026 · Tap each item when loaded</p>
+    <h1><span class="blue">EUBC</span> BUCS trailer plan</h1>
+    <p>Long press each item when loaded · Make sure things are secured properly</p>
   </div>
 
   <!-- Progress -->
   <div class="progress-section glass">
     <div class="progress-label">
-      <span>Loading progress</span>
+      <span>Progress</span>
       <span><strong id="loadedCount">0</strong> / <span id="totalCount">82</span></span>
     </div>
     <div class="progress-track">
@@ -790,38 +814,38 @@
     <div class="trailer-wrap">
       <div class="eubc-diagram">
         <div class="eubc-top-row">
-          <div class="boat-slot" data-id="ehu282"><button class="load-btn">✓</button><span class="boat-name">EHU282</span></div>
-          <div class="boat-slot" data-id="ehu290"><button class="load-btn">✓</button><span class="boat-name">EHU290</span></div>
-          <div class="boat-slot" data-id="ehu291"><button class="load-btn">✓</button><span class="boat-name">EHU291</span></div>
-          <div class="boat-slot" data-id="ehu292"><button class="load-btn">✓</button><span class="boat-name">EHU292</span></div>
+          <div class="boat-slot" data-id="ehu282"><button class="load-btn"></button><span class="boat-name">EHU282</span></div>
+          <div class="boat-slot" data-id="ehu290"><button class="load-btn"></button><span class="boat-name">EHU290</span></div>
+          <div class="boat-slot" data-id="ehu291"><button class="load-btn"></button><span class="boat-name">EHU291</span></div>
+          <div class="boat-slot" data-id="ehu292"><button class="load-btn"></button><span class="boat-name">EHU292</span></div>
         </div>
         <div class="eubc-frame">
           <div class="centre-v"></div>
           <div class="guide-l"></div>
           <div class="guide-r"></div>
           <div class="eubc-rack">
-            <div class="boat-slot" data-id="ehu280"><button class="load-btn">✓</button><span class="boat-name">EHU280</span></div>
-            <div class="boat-slot" data-id="ehu470"><button class="load-btn">✓</button><span class="boat-name">EHU470</span></div>
-            <div class="boat-slot" data-id="ehu472"><button class="load-btn">✓</button><span class="boat-name">EHU472</span></div>
-            <div class="boat-slot" data-id="ehu284"><button class="load-btn">✓</button><span class="boat-name">EHU 284</span></div>
+            <div class="boat-slot" data-id="ehu280"><button class="load-btn"></button><span class="boat-name">EHU280</span></div>
+            <div class="boat-slot" data-id="ehu470"><button class="load-btn"></button><span class="boat-name">EHU470</span></div>
+            <div class="boat-slot" data-id="ehu472"><button class="load-btn"></button><span class="boat-name">EHU472</span></div>
+            <div class="boat-slot" data-id="ehu284"><button class="load-btn"></button><span class="boat-name">EHU 284</span></div>
           </div>
           <div class="eubc-rack">
-            <div class="boat-slot" data-id="ehu471"><button class="load-btn">✓</button><span class="boat-name">EHU471</span></div>
-            <div class="boat-slot" data-id="jim-aitken-ls"><button class="load-btn">✓</button><span class="boat-name">Jim Aitken long section</span></div>
-            <div class="boat-slot" data-id="w-usp-ls"><button class="load-btn">✓</button><span class="boat-name">W USP long section</span></div>
-            <div class="boat-slot" data-id="ehu283"><button class="load-btn">✓</button><span class="boat-name">EHU 283</span></div>
+            <div class="boat-slot" data-id="ehu471"><button class="load-btn"></button><span class="boat-name">EHU471</span></div>
+            <div class="boat-slot" data-id="jim-aitken-ls"><button class="load-btn"></button><span class="boat-name">Jim Aitken long section</span></div>
+            <div class="boat-slot" data-id="w-usp-ls"><button class="load-btn"></button><span class="boat-name">W USP long section</span></div>
+            <div class="boat-slot" data-id="ehu283"><button class="load-btn"></button><span class="boat-name">EHU 283</span></div>
           </div>
           <div class="eubc-rack">
-            <div class="boat-slot" data-id="ehu270"><button class="load-btn">✓</button><span class="boat-name">EHU 270</span></div>
-            <div class="boat-slot" data-id="hugh-edmiston-ls"><button class="load-btn">✓</button><span class="boat-name">Hugh Edmiston long section</span></div>
-            <div class="boat-slot" data-id="phil-mcnaul-ls"><button class="load-btn">✓</button><span class="boat-name">Phil McNaul long section</span></div>
-            <div class="boat-slot" data-id="ehu271"><button class="load-btn">✓</button><span class="boat-name">EHU 271</span></div>
+            <div class="boat-slot" data-id="ehu270"><button class="load-btn"></button><span class="boat-name">EHU 270</span></div>
+            <div class="boat-slot" data-id="hugh-edmiston-ls"><button class="load-btn"></button><span class="boat-name">Hugh Edmiston long section</span></div>
+            <div class="boat-slot" data-id="phil-mcnaul-ls"><button class="load-btn"></button><span class="boat-name">Phil McNaul long section</span></div>
+            <div class="boat-slot" data-id="ehu271"><button class="load-btn"></button><span class="boat-name">EHU 271</span></div>
           </div>
           <div class="eubc-rack">
-            <div class="boat-slot" data-id="hugh-edmiston-ss"><button class="load-btn">✓</button><span class="boat-name">Hugh Edmiston short section</span></div>
-            <div class="boat-slot" data-id="jim-aitken-ss"><button class="load-btn">✓</button><span class="boat-name">Jim Aitken short section</span></div>
-            <div class="boat-slot" data-id="w-usp-ss"><button class="load-btn">✓</button><span class="boat-name">W USP short section</span></div>
-            <div class="boat-slot" data-id="phil-mcnaul-ss"><button class="load-btn">✓</button><span class="boat-name">Phil McNaul short section</span></div>
+            <div class="boat-slot" data-id="hugh-edmiston-ss"><button class="load-btn"></button><span class="boat-name">Hugh Edmiston short section</span></div>
+            <div class="boat-slot" data-id="jim-aitken-ss"><button class="load-btn"></button><span class="boat-name">Jim Aitken short section</span></div>
+            <div class="boat-slot" data-id="w-usp-ss"><button class="load-btn"></button><span class="boat-name">W USP short section</span></div>
+            <div class="boat-slot" data-id="phil-mcnaul-ss"><button class="load-btn"></button><span class="boat-name">Phil McNaul short section</span></div>
           </div>
         </div>
       </div>
@@ -832,32 +856,32 @@
     <div class="trailer-wrap">
       <div class="sr-diagram">
         <div class="sr-top-row">
-          <div class="boat-slot" data-id="plank"><button class="load-btn">✓</button><span class="boat-name">Plank</span></div>
-          <div class="boat-slot" data-id="matthews"><button class="load-btn">✓</button><span class="boat-name">Matthews</span></div>
-          <div class="boat-slot" data-id="ehu192"><button class="load-btn">✓</button><span class="boat-name">EHU192</span></div>
+          <div class="boat-slot" data-id="plank"><button class="load-btn"></button><span class="boat-name">Plank</span></div>
+          <div class="boat-slot" data-id="matthews"><button class="load-btn"></button><span class="boat-name">Matthews</span></div>
+          <div class="boat-slot" data-id="ehu192"><button class="load-btn"></button><span class="boat-name">EHU192</span></div>
         </div>
         <div class="sr-frame">
           <div class="div-1"></div>
           <div class="div-2"></div>
           <div class="sr-rack">
-            <div class="boat-slot" data-id="ronan"><button class="load-btn">✓</button><span class="boat-name">Ronan</span></div>
-            <div class="boat-slot" data-id="callum"><button class="load-btn">✓</button><span class="boat-name">Callum</span></div>
-            <div class="boat-slot" data-id="ehu490"><button class="load-btn">✓</button><span class="boat-name">EHU490</span></div>
+            <div class="boat-slot" data-id="ronan"><button class="load-btn"></button><span class="boat-name">Ronan</span></div>
+            <div class="boat-slot" data-id="callum"><button class="load-btn"></button><span class="boat-name">Callum</span></div>
+            <div class="boat-slot" data-id="ehu490"><button class="load-btn"></button><span class="boat-name">EHU490</span></div>
           </div>
           <div class="sr-rack">
-            <div class="boat-slot" data-id="ehu480"><button class="load-btn">✓</button><span class="boat-name">EHU480</span></div>
-            <div class="boat-slot" data-id="kg-ii-ls"><button class="load-btn">✓</button><span class="boat-name">KG II long section</span></div>
-            <div class="boat-slot" data-id="sarju"><button class="load-btn">✓</button><span class="boat-name">Sarju</span></div>
+            <div class="boat-slot" data-id="ehu480"><button class="load-btn"></button><span class="boat-name">EHU480</span></div>
+            <div class="boat-slot" data-id="kg-ii-ls"><button class="load-btn"></button><span class="boat-name">KG II long section</span></div>
+            <div class="boat-slot" data-id="sarju"><button class="load-btn"></button><span class="boat-name">Sarju</span></div>
           </div>
           <div class="sr-rack">
             <div class="split-cell">
-              <div class="boat-slot" data-id="ehu171"><button class="load-btn">✓</button><span class="boat-name">EHU 171</span></div>
-              <div class="boat-slot" data-id="ehu170"><button class="load-btn">✓</button><span class="boat-name">EHU 170</span></div>
+              <div class="boat-slot" data-id="ehu171"><button class="load-btn"></button><span class="boat-name">EHU 171</span></div>
+              <div class="boat-slot" data-id="ehu170"><button class="load-btn"></button><span class="boat-name">EHU 170</span></div>
             </div>
-            <div class="boat-slot" data-id="kg-ii-ss"><button class="load-btn">✓</button><span class="boat-name">KG II short section</span></div>
+            <div class="boat-slot" data-id="kg-ii-ss"><button class="load-btn"></button><span class="boat-name">KG II short section</span></div>
             <div class="split-cell">
-              <div class="boat-slot" data-id="ehu173"><button class="load-btn">✓</button><span class="boat-name">EHU 173</span></div>
-              <div class="boat-slot" data-id="ehu174"><button class="load-btn">✓</button><span class="boat-name">EHU 174</span></div>
+              <div class="boat-slot" data-id="ehu173"><button class="load-btn"></button><span class="boat-name">EHU 173</span></div>
+              <div class="boat-slot" data-id="ehu174"><button class="load-btn"></button><span class="boat-name">EHU 174</span></div>
             </div>
           </div>
         </div>
@@ -929,34 +953,34 @@
     <div class="checklist-grid">
       <div class="checklist-card glass-subtle">
         <h3>Sweep Oars</h3>
-        <div class="item" data-id="oar-mens-one-blue"><button class="load-btn">✓</button><span class="item-name">Men's One Blue</span></div>
-        <div class="item" data-id="oar-mens-two-blue"><button class="load-btn">✓</button><span class="item-name">Men's Two Blue</span></div>
-        <div class="item" data-id="oar-womens-yellowpink"><button class="load-btn">✓</button><span class="item-name">Women's Yellow/Pink (plain edge)</span></div>
-        <div class="item" data-id="oar-womens-one-yellow"><button class="load-btn">✓</button><span class="item-name">Women's One Yellow (plain edge)</span></div>
-        <div class="item" data-id="oar-fat2s"><button class="load-btn">✓</button><span class="item-name">Fat2s</span></div>
+        <div class="item" data-id="oar-mens-one-blue"><button class="load-btn"></button><span class="item-name">Men's One Blue</span></div>
+        <div class="item" data-id="oar-mens-two-blue"><button class="load-btn"></button><span class="item-name">Men's Two Blue</span></div>
+        <div class="item" data-id="oar-womens-yellowpink"><button class="load-btn"></button><span class="item-name">Women's Yellow/Pink (plain edge)</span></div>
+        <div class="item" data-id="oar-womens-one-yellow"><button class="load-btn"></button><span class="item-name">Women's One Yellow (plain edge)</span></div>
+        <div class="item" data-id="oar-fat2s"><button class="load-btn"></button><span class="item-name">Fat2s</span></div>
       </div>
       <div class="checklist-card glass-subtle">
         <h3>Sculling Oars</h3>
-        <div class="item" data-id="scull-croker-arrows"><button class="load-btn">✓</button><span class="item-name">Croker Arrows (four sets)</span></div>
-        <div class="item" data-id="scull-fat2-skinny"><button class="load-btn">✓</button><span class="item-name">Fat2 Skinny (six sets)</span></div>
-        <div class="item" data-id="scull-fat2-canal"><button class="load-btn">✓</button><span class="item-name">Fat2 canal (three sets)</span></div>
-        <div class="item" data-id="scull-canal"><button class="load-btn">✓</button><span class="item-name">Canal sculls</span></div>
-        <div class="item" data-id="scull-red-yellow"><button class="load-btn">✓</button><span class="item-name">Red/Yellow (all sets)</span></div>
-        <div class="item" data-id="scull-blue-red"><button class="load-btn">✓</button><span class="item-name">Blue/Red</span></div>
+        <div class="item" data-id="scull-croker-arrows"><button class="load-btn"></button><span class="item-name">Croker Arrows (four sets)</span></div>
+        <div class="item" data-id="scull-fat2-skinny"><button class="load-btn"></button><span class="item-name">Fat2 Skinny (six sets)</span></div>
+        <div class="item" data-id="scull-fat2-canal"><button class="load-btn"></button><span class="item-name">Fat2 canal (three sets)</span></div>
+        <div class="item" data-id="scull-canal"><button class="load-btn"></button><span class="item-name">Canal sculls</span></div>
+        <div class="item" data-id="scull-red-yellow"><button class="load-btn"></button><span class="item-name">Red/Yellow (all sets)</span></div>
+        <div class="item" data-id="scull-blue-red"><button class="load-btn"></button><span class="item-name">Blue/Red</span></div>
       </div>
       <div class="checklist-card glass-subtle">
         <h3>Coxes Checklist</h3>
-        <div class="item" data-id="cox-lifejackets"><button class="load-btn">✓</button><span class="item-name">Lifejackets</span></div>
-        <div class="item" data-id="cox-coxboxes"><button class="load-btn">✓</button><span class="item-name">Coxboxes (and chargers)</span></div>
-        <div class="item" data-id="cox-chargers"><button class="load-btn">✓</button><span class="item-name">Chargers</span></div>
-        <div class="item" data-id="cox-weights"><button class="load-btn">✓</button><span class="item-name">Weights</span></div>
+        <div class="item" data-id="cox-lifejackets"><button class="load-btn"></button><span class="item-name">Lifejackets</span></div>
+        <div class="item" data-id="cox-coxboxes"><button class="load-btn"></button><span class="item-name">Coxboxes (and chargers)</span></div>
+        <div class="item" data-id="cox-chargers"><button class="load-btn"></button><span class="item-name">Chargers</span></div>
+        <div class="item" data-id="cox-weights"><button class="load-btn"></button><span class="item-name">Weights</span></div>
       </div>
       <div class="checklist-card glass-subtle">
         <h3>General Items</h3>
-        <div class="item" data-id="gen-speedcoaches"><button class="load-btn">✓</button><span class="item-name">Speedcoaches (and chargers)</span></div>
-        <div class="item" data-id="gen-trestles"><button class="load-btn">✓</button><span class="item-name">Trestles</span></div>
-        <div class="item" data-id="gen-low-stands"><button class="load-btn">✓</button><span class="item-name">Low stands</span></div>
-        <div class="item" data-id="gen-spare-parts"><button class="load-btn">✓</button><span class="item-name">Spare parts boxes</span></div>
+        <div class="item" data-id="gen-speedcoaches"><button class="load-btn"></button><span class="item-name">Speedcoaches (and chargers)</span></div>
+        <div class="item" data-id="gen-trestles"><button class="load-btn"></button><span class="item-name">Trestles</span></div>
+        <div class="item" data-id="gen-low-stands"><button class="load-btn"></button><span class="item-name">Low stands</span></div>
+        <div class="item" data-id="gen-spare-parts"><button class="load-btn"></button><span class="item-name">Spare parts boxes</span></div>
       </div>
     </div>
   </div>
@@ -966,7 +990,7 @@
     <div class="safety-icon">⚠</div>
     <div class="safety-text">
       <div class="label">Pre-Loading Safety Check</div>
-      <p>CHECK HEEL RESTRAINTS, HATCH COVERS, BOW BALLS, SHOE SCREWS BEFORE LOADING</p>
+      <p>CHECK HEEL RESTRAINTS, HATCH COVERS, BOW BALLS, SHOE SCREWS BEFORE LOADING - report any issues to a coach!</p>
     </div>
   </div>
 
