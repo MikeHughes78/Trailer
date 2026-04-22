@@ -33,10 +33,20 @@
       position: relative;
       height: 100vh;
       width: 100%;
-      background: url("4+canal.jpg") no-repeat center 35% / cover;
+      overflow: hidden;
     }
 
+    /* Background layer for zoom effect */
     .hero::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: url("4+canal.jpg") no-repeat center 35% / cover;
+      animation: slowZoom 30s ease-out forwards;
+    }
+
+    /* Overlay */
+    .hero::after {
       content: "";
       position: absolute;
       inset: 0;
@@ -62,7 +72,8 @@
       letter-spacing: -0.02em;
       line-height: 0.95;
       opacity: 0;
-      animation: titleFadeSettle 6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+      filter: blur(6px);
+      animation: titleReveal 6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
     }
 
     .divider {
@@ -71,7 +82,7 @@
       background: rgba(245, 242, 236, 0.6);
       margin-top: 1.1rem;
       opacity: 0;
-      animation: fadeInSoft 1.4s ease 5.2s forwards;
+      animation: fadeInSoft 1s ease 3.8s forwards;
     }
 
     .footer-links {
@@ -81,7 +92,7 @@
       align-items: center;
       gap: 0.65rem;
       opacity: 0;
-      animation: fadeInSoft 1.4s ease 5.8s forwards;
+      animation: fadeInSoft 1s ease 4.2s forwards; /* 👈 earlier */
     }
 
     .footer-links a {
@@ -111,15 +122,18 @@
       width: 100%;
     }
 
-    @keyframes titleFadeSettle {
+    @keyframes titleReveal {
       0% {
         opacity: 0;
+        filter: blur(6px);
       }
-      38% {
+      35% {
         opacity: 1;
+        filter: blur(0);
       }
       100% {
         opacity: 0.5;
+        filter: blur(0);
       }
     }
 
@@ -128,12 +142,21 @@
         opacity: 0;
       }
       to {
-        opacity: 0.75; /* 👈 softer final state */
+        opacity: 0.75;
+      }
+    }
+
+    @keyframes slowZoom {
+      from {
+        transform: scale(1);
+      }
+      to {
+        transform: scale(1.08);
       }
     }
 
     @media (max-width: 640px) {
-      .hero {
+      .hero::before {
         background-position: center 30%;
       }
 
@@ -153,7 +176,7 @@
     }
 
     @media (max-height: 500px) and (orientation: landscape) {
-      .hero {
+      .hero::before {
         background-position: center 25%;
       }
 
