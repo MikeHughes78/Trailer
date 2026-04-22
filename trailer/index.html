@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>EUBC trailer loading plan - BUCS Regatta 2026</title>
+<title>EUBC Trailer Loading Plan — BUCS Regatta 2026</title>
 <link href="https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@300;400;600;700&family=SF+Pro+Text:wght@400;500;600&family=JetBrains+Mono:wght@500;700&family=Pacifico&display=swap" rel="stylesheet">
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
@@ -352,6 +352,48 @@
     box-shadow: 0 2px 8px rgba(46,204,113,0.3);
   }
 
+  /* Long-press fill ring */
+  .press-ring {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 30px; height: 30px;
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 5;
+  }
+  .press-ring svg {
+    width: 100%; height: 100%;
+    transform: rotate(-90deg);
+  }
+  .press-ring circle {
+    fill: none;
+    stroke: var(--btn-done);
+    stroke-width: 3;
+    stroke-dasharray: 82;
+    stroke-dashoffset: 82;
+    stroke-linecap: round;
+    transition: none;
+  }
+  .press-ring.filling circle {
+    stroke-dashoffset: 0;
+    transition: stroke-dashoffset 0.6s linear;
+  }
+  /* Unload uses a red ring */
+  .press-ring.unloading circle {
+    stroke: var(--safety-red);
+    stroke-dashoffset: 0;
+    transition: stroke-dashoffset 0.6s linear;
+  }
+
+  /* Pulse hint on the button during press */
+  .boat-slot.pressing, .item.pressing {
+    background: rgba(46,204,113,0.06);
+  }
+  .boat-slot.loaded.pressing, .item.loaded.pressing {
+    background: rgba(231,76,60,0.06);
+  }
+
   .empty-slot { min-height: 54px; padding: 14px 6px; }
 
   /* ── Ripple & confetti ── */
@@ -547,8 +589,8 @@
 
   <!-- Header -->
   <div class="header glass">
-    <h1><span class="blue">EUBC</span> BUCS trailer loading plan</h1>
-    <p>Check each item when loaded (and tied down)</p>
+    <h1><span class="blue">EUBC</span> Trailer Loading Plan</h1>
+    <p>BUCS Regatta 2026 · Tap each item when loaded</p>
   </div>
 
   <!-- Progress -->
@@ -569,7 +611,7 @@
     <div class="trailer-wrap">
       <div class="eubc-diagram">
         <div class="eubc-top-row">
-          <div class="boat-slot" data-id="ehu175"><button class="load-btn">✓</button><span class="boat-name">EHU175</span></div>
+          <div class="boat-slot" data-id="ehu282"><button class="load-btn">✓</button><span class="boat-name">EHU282</span></div>
           <div class="boat-slot" data-id="ehu290"><button class="load-btn">✓</button><span class="boat-name">EHU290</span></div>
           <div class="boat-slot" data-id="ehu291"><button class="load-btn">✓</button><span class="boat-name">EHU291</span></div>
           <div class="boat-slot" data-id="ehu292"><button class="load-btn">✓</button><span class="boat-name">EHU292</span></div>
@@ -579,28 +621,28 @@
           <div class="guide-l"></div>
           <div class="guide-r"></div>
           <div class="eubc-rack">
-            <div class="boat-slot" data-id="ehu471"><button class="load-btn">✓</button><span class="boat-name">EHU471</span></div>
+            <div class="boat-slot" data-id="ehu280"><button class="load-btn">✓</button><span class="boat-name">EHU280</span></div>
             <div class="boat-slot" data-id="ehu470"><button class="load-btn">✓</button><span class="boat-name">EHU470</span></div>
             <div class="boat-slot" data-id="ehu472"><button class="load-btn">✓</button><span class="boat-name">EHU472</span></div>
             <div class="boat-slot" data-id="ehu284"><button class="load-btn">✓</button><span class="boat-name">EHU 284</span></div>
           </div>
           <div class="eubc-rack">
-            <div class="boat-slot" data-id="ehu280"><button class="load-btn">✓</button><span class="boat-name">EHU 280</span></div>
-            <div class="boat-slot" data-id="jim-aitken-ls"><button class="load-btn">✓</button><span class="boat-name">Jim Aitken LS</span></div>
-            <div class="boat-slot" data-id="w-usp-ls"><button class="load-btn">✓</button><span class="boat-name">W USP LS</span></div>
+            <div class="boat-slot" data-id="ehu471"><button class="load-btn">✓</button><span class="boat-name">EHU471</span></div>
+            <div class="boat-slot" data-id="jim-aitken-ls"><button class="load-btn">✓</button><span class="boat-name">Jim Aitken long section</span></div>
+            <div class="boat-slot" data-id="w-usp-ls"><button class="load-btn">✓</button><span class="boat-name">W USP long section</span></div>
             <div class="boat-slot" data-id="ehu283"><button class="load-btn">✓</button><span class="boat-name">EHU 283</span></div>
           </div>
           <div class="eubc-rack">
             <div class="boat-slot" data-id="ehu270"><button class="load-btn">✓</button><span class="boat-name">EHU 270</span></div>
-            <div class="boat-slot" data-id="hugh-edmiston-ls"><button class="load-btn">✓</button><span class="boat-name">Hugh Edmiston LS</span></div>
-            <div class="boat-slot" data-id="phil-mcnaul-ls"><button class="load-btn">✓</button><span class="boat-name">Phil McNaul LS</span></div>
+            <div class="boat-slot" data-id="hugh-edmiston-ls"><button class="load-btn">✓</button><span class="boat-name">Hugh Edmiston long section</span></div>
+            <div class="boat-slot" data-id="phil-mcnaul-ls"><button class="load-btn">✓</button><span class="boat-name">Phil McNaul long section</span></div>
             <div class="boat-slot" data-id="ehu271"><button class="load-btn">✓</button><span class="boat-name">EHU 271</span></div>
           </div>
           <div class="eubc-rack">
-            <div class="boat-slot" data-id="hugh-edmiston-ss"><button class="load-btn">✓</button><span class="boat-name">Hugh Edmiston SS</span></div>
-            <div class="boat-slot" data-id="jim-aitken-ss"><button class="load-btn">✓</button><span class="boat-name">Jim Aitken SS</span></div>
-            <div class="boat-slot" data-id="w-usp-ss"><button class="load-btn">✓</button><span class="boat-name">W USP SS</span></div>
-            <div class="boat-slot" data-id="phil-mcnaul-ss"><button class="load-btn">✓</button><span class="boat-name">Phil McNaul SS</span></div>
+            <div class="boat-slot" data-id="hugh-edmiston-ss"><button class="load-btn">✓</button><span class="boat-name">Hugh Edmiston short section</span></div>
+            <div class="boat-slot" data-id="jim-aitken-ss"><button class="load-btn">✓</button><span class="boat-name">Jim Aitken short section</span></div>
+            <div class="boat-slot" data-id="w-usp-ss"><button class="load-btn">✓</button><span class="boat-name">W USP short section</span></div>
+            <div class="boat-slot" data-id="phil-mcnaul-ss"><button class="load-btn">✓</button><span class="boat-name">Phil McNaul short section</span></div>
           </div>
         </div>
       </div>
@@ -613,7 +655,7 @@
         <div class="sr-top-row">
           <div class="boat-slot" data-id="plank"><button class="load-btn">✓</button><span class="boat-name">Plank</span></div>
           <div class="boat-slot" data-id="matthews"><button class="load-btn">✓</button><span class="boat-name">Matthews</span></div>
-          <div class="boat-slot" data-id="ehu193"><button class="load-btn">✓</button><span class="boat-name">EHU193</span></div>
+          <div class="boat-slot" data-id="ehu192"><button class="load-btn">✓</button><span class="boat-name">EHU192</span></div>
         </div>
         <div class="sr-frame">
           <div class="div-1"></div>
@@ -625,7 +667,7 @@
           </div>
           <div class="sr-rack">
             <div class="boat-slot" data-id="ehu480"><button class="load-btn">✓</button><span class="boat-name">EHU480</span></div>
-            <div class="boat-slot" data-id="kg-ii-ls"><button class="load-btn">✓</button><span class="boat-name">KG II LS</span></div>
+            <div class="boat-slot" data-id="kg-ii-ls"><button class="load-btn">✓</button><span class="boat-name">KG II long section</span></div>
             <div class="boat-slot" data-id="sarju"><button class="load-btn">✓</button><span class="boat-name">Sarju</span></div>
           </div>
           <div class="sr-rack">
@@ -633,7 +675,7 @@
               <div class="boat-slot" data-id="ehu171"><button class="load-btn">✓</button><span class="boat-name">EHU 171</span></div>
               <div class="boat-slot" data-id="ehu170"><button class="load-btn">✓</button><span class="boat-name">EHU 170</span></div>
             </div>
-            <div class="boat-slot" data-id="kg-ii-ss"><button class="load-btn">✓</button><span class="boat-name">KG II SS</span></div>
+            <div class="boat-slot" data-id="kg-ii-ss"><button class="load-btn">✓</button><span class="boat-name">KG II short section</span></div>
             <div class="split-cell">
               <div class="boat-slot" data-id="ehu173"><button class="load-btn">✓</button><span class="boat-name">EHU 173</span></div>
               <div class="boat-slot" data-id="ehu174"><button class="load-btn">✓</button><span class="boat-name">EHU 174</span></div>
@@ -687,8 +729,8 @@
   <div class="safety-banner">
     <div class="safety-icon">⚠</div>
     <div class="safety-text">
-      <div class="label">Pre-loading safety check</div>
-      <p>CHECK HEEL RESTRAINTS, HATCH COVERS, BOW BALLS, SHOE SCREWS BEFORE LOADING - report any issues to a coach</p>
+      <div class="label">Pre-Loading Safety Check</div>
+      <p>CHECK HEEL RESTRAINTS, HATCH COVERS, BOW BALLS, SHOE SCREWS BEFORE LOADING</p>
     </div>
   </div>
 
@@ -1016,19 +1058,103 @@
     refresh();
   });
 
-  // ── Click ──
+  // ── Long-press handler (600ms hold to toggle) ──
+  const HOLD_MS = 600;
+
+  function createRing(btn) {
+    const ring = document.createElement('div');
+    ring.className = 'press-ring';
+    ring.innerHTML = '<svg viewBox="0 0 30 30"><circle cx="15" cy="15" r="13"/></svg>';
+    btn.appendChild(ring);
+    return ring;
+  }
+
   allItems.forEach(el => {
-    el.addEventListener('click', function() {
-      const id = el.dataset.id;
-      const isLoaded = !el.classList.contains('loaded');
-      const isBoat = el.classList.contains('boat-slot');
+    let pressTimer = null;
+    let ring = null;
+    let startX = 0, startY = 0;
+    const MOVE_THRESHOLD = 10;
+
+    function startPress(e) {
+      // Prevent context menu on long press
+      e.preventDefault();
+      const touch = e.touches ? e.touches[0] : e;
+      startX = touch.clientX;
+      startY = touch.clientY;
+
       const btn = el.querySelector('.load-btn');
-      el.classList.toggle('loaded');
-      refresh();
-      db.child(id).set(isLoaded ? true : null);
-      if (isLoaded) { playTick(isBoat); spawnRipple(btn); spawnMiniConfetti(btn); }
-      else playUntick();
-    });
+      ring = createRing(btn);
+      const isLoaded = el.classList.contains('loaded');
+
+      // Start the fill animation after a frame
+      requestAnimationFrame(() => {
+        ring.classList.add(isLoaded ? 'unloading' : 'filling');
+      });
+      el.classList.add('pressing');
+
+      pressTimer = setTimeout(() => {
+        // Long press complete — toggle the item
+        const id = el.dataset.id;
+        const willLoad = !el.classList.contains('loaded');
+        const isBoat = el.classList.contains('boat-slot');
+
+        el.classList.toggle('loaded');
+        el.classList.remove('pressing');
+        refresh();
+        db.child(id).set(willLoad ? true : null);
+
+        if (willLoad) {
+          playTick(isBoat);
+          spawnRipple(btn);
+          spawnMiniConfetti(btn);
+        } else {
+          playUntick();
+        }
+
+        cleanupRing();
+      }, HOLD_MS);
+    }
+
+    function cancelPress() {
+      if (pressTimer) {
+        clearTimeout(pressTimer);
+        pressTimer = null;
+      }
+      el.classList.remove('pressing');
+      cleanupRing();
+    }
+
+    function moveCheck(e) {
+      if (!pressTimer) return;
+      const touch = e.touches ? e.touches[0] : e;
+      const dx = Math.abs(touch.clientX - startX);
+      const dy = Math.abs(touch.clientY - startY);
+      if (dx > MOVE_THRESHOLD || dy > MOVE_THRESHOLD) {
+        cancelPress();
+      }
+    }
+
+    function cleanupRing() {
+      if (ring) {
+        ring.remove();
+        ring = null;
+      }
+    }
+
+    // Touch events (mobile)
+    el.addEventListener('touchstart', startPress, { passive: false });
+    el.addEventListener('touchend', cancelPress);
+    el.addEventListener('touchcancel', cancelPress);
+    el.addEventListener('touchmove', moveCheck, { passive: true });
+
+    // Mouse events (desktop)
+    el.addEventListener('mousedown', startPress);
+    el.addEventListener('mouseup', cancelPress);
+    el.addEventListener('mouseleave', cancelPress);
+
+    // Prevent default click and context menu
+    el.addEventListener('click', e => e.preventDefault());
+    el.addEventListener('contextmenu', e => e.preventDefault());
   });
 
   document.getElementById('resetBtn').addEventListener('click', function() {
