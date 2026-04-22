@@ -352,46 +352,95 @@
     box-shadow: 0 2px 8px rgba(46,204,113,0.3);
   }
 
-  /* Long-press fill ring */
-  .press-ring {
+  /* Long-press radiating pulse — large enough to see past a finger */
+  .press-pulse {
     position: absolute;
     top: 50%; left: 50%;
     transform: translate(-50%, -50%);
-    width: 30px; height: 30px;
+    width: 120px; height: 120px;
     border-radius: 50%;
     pointer-events: none;
     z-index: 5;
   }
-  .press-ring svg {
-    width: 100%; height: 100%;
-    transform: rotate(-90deg);
+  /* Outer expanding ring */
+  .press-pulse::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    border: 2px solid var(--btn-done);
+    opacity: 0;
+    transform: scale(0.2);
   }
-  .press-ring circle {
-    fill: none;
-    stroke: var(--btn-done);
-    stroke-width: 3;
-    stroke-dasharray: 82;
-    stroke-dashoffset: 82;
-    stroke-linecap: round;
-    transition: none;
-  }
-  .press-ring.filling circle {
-    stroke-dashoffset: 0;
-    transition: stroke-dashoffset 0.6s linear;
-  }
-  /* Unload uses a red ring */
-  .press-ring.unloading circle {
-    stroke: var(--safety-red);
-    stroke-dashoffset: 0;
-    transition: stroke-dashoffset 0.6s linear;
+  /* Inner glow */
+  .press-pulse::after {
+    content: '';
+    position: absolute;
+    inset: 15%;
+    border-radius: 50%;
+    opacity: 0;
   }
 
-  /* Pulse hint on the button during press */
+  /* Loading: green expanding */
+  .press-pulse.filling::before {
+    animation: pulse-ring-out 0.6s linear forwards;
+    border-color: var(--btn-done);
+  }
+  .press-pulse.filling::after {
+    animation: pulse-glow 0.6s ease-out forwards;
+    background: radial-gradient(circle, rgba(46,204,113,0.25) 0%, transparent 70%);
+  }
+
+  /* Unloading: red expanding */
+  .press-pulse.unloading::before {
+    animation: pulse-ring-out 0.6s linear forwards;
+    border-color: var(--safety-red);
+  }
+  .press-pulse.unloading::after {
+    animation: pulse-glow 0.6s ease-out forwards;
+    background: radial-gradient(circle, rgba(231,76,60,0.2) 0%, transparent 70%);
+  }
+
+  @keyframes pulse-ring-out {
+    0% { transform: scale(0.2); opacity: 0.8; }
+    60% { opacity: 0.6; }
+    100% { transform: scale(1); opacity: 0.3; }
+  }
+  @keyframes pulse-glow {
+    0% { transform: scale(0.3); opacity: 0; }
+    30% { opacity: 0.8; }
+    100% { transform: scale(1.2); opacity: 0.5; }
+  }
+
+  /* Repeating sonar rings during hold */
+  .sonar-ring {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%) scale(0);
+    width: 100px; height: 100px;
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 4;
+    animation: sonar 0.8s ease-out forwards;
+  }
+  .sonar-ring.load-sonar {
+    border: 1.5px solid rgba(46,204,113,0.5);
+  }
+  .sonar-ring.unload-sonar {
+    border: 1.5px solid rgba(231,76,60,0.4);
+  }
+  @keyframes sonar {
+    0% { transform: translate(-50%, -50%) scale(0.3); opacity: 0.7; }
+    100% { transform: translate(-50%, -50%) scale(1.8); opacity: 0; }
+  }
+
+  /* Pressing state — whole row highlights */
   .boat-slot.pressing, .item.pressing {
-    background: rgba(46,204,113,0.06);
+    background: rgba(46,204,113,0.08);
+    transition: background 0.15s ease;
   }
   .boat-slot.loaded.pressing, .item.loaded.pressing {
-    background: rgba(231,76,60,0.06);
+    background: rgba(231,76,60,0.08);
   }
 
   .empty-slot { min-height: 54px; padding: 14px 6px; }
@@ -1061,12 +1110,18 @@
   // ── Long-press handler (600ms hold to toggle) ──
   const HOLD_MS = 600;
 
-  function createRing(btn) {
-    const ring = document.createElement('div');
-    ring.className = 'press-ring';
-    ring.innerHTML = '<svg viewBox="0 0 30 30"><circle cx="15" cy="15" r="13"/></svg>';
-    btn.appendChild(ring);
-    return ring;
+  function createPulse(btn) {
+    const p = document.createElement('div');
+    p.className = 'press-pulse';
+    btn.appendChild(p);
+    return p;
+  }
+
+  function spawnSonar(btn, isLoaded) {
+    const s = document.createElement('div');
+    s.className = 'sonar-ring ' + (isLoaded ? 'unload-sonar' : 'load-sonar');
+    btn.appendChild(s);
+    s.addEventListener('animationend', () => s.remove());
   }
 
   // Rising tone during press (loading)
@@ -1076,7 +1131,6 @@
     const o = ac.createOscillator();
     const g = ac.createGain();
     o.type = 'sine';
-    // Rise from C5 to B5 over the hold duration
     o.frequency.setValueAtTime(523, now);
     o.frequency.exponentialRampToValueAtTime(988, now + HOLD_MS / 1000);
     g.gain.setValueAtTime(0.06, now);
@@ -1087,14 +1141,12 @@
     return { osc: o, gain: g };
   }
 
-  // Falling tone during press (unloading)
   function startFallingTone() {
     const ac = getAudioCtx();
     const now = ac.currentTime;
     const o = ac.createOscillator();
     const g = ac.createGain();
     o.type = 'sine';
-    // Fall from G5 to C4 over the hold duration
     o.frequency.setValueAtTime(784, now);
     o.frequency.exponentialRampToValueAtTime(262, now + HOLD_MS / 1000);
     g.gain.setValueAtTime(0.06, now);
@@ -1105,7 +1157,6 @@
     return { osc: o, gain: g };
   }
 
-  // Stop the press tone (fade out quickly)
   function stopPressTone(tone) {
     if (!tone) return;
     try {
@@ -1119,8 +1170,9 @@
 
   allItems.forEach(el => {
     let pressTimer = null;
-    let ring = null;
+    let pulse = null;
     let pressTone = null;
+    let sonarInterval = null;
     let startX = 0, startY = 0;
     const MOVE_THRESHOLD = 10;
 
@@ -1131,24 +1183,26 @@
       startY = touch.clientY;
 
       const btn = el.querySelector('.load-btn');
-      ring = createRing(btn);
+      pulse = createPulse(btn);
       const isLoaded = el.classList.contains('loaded');
 
-      // Start the fill animation after a frame
       requestAnimationFrame(() => {
-        ring.classList.add(isLoaded ? 'unloading' : 'filling');
+        pulse.classList.add(isLoaded ? 'unloading' : 'filling');
       });
       el.classList.add('pressing');
 
-      // Start the continuous tone
+      // Spawn sonar rings every 200ms during hold
+      spawnSonar(btn, isLoaded);
+      sonarInterval = setInterval(() => spawnSonar(btn, isLoaded), 200);
+
       pressTone = isLoaded ? startFallingTone() : startRisingTone();
 
       pressTimer = setTimeout(() => {
-        // Rising/falling tone completed — stop it
         stopPressTone(pressTone);
         pressTone = null;
+        clearInterval(sonarInterval);
+        sonarInterval = null;
 
-        // Long press complete — toggle the item
         const id = el.dataset.id;
         const willLoad = !el.classList.contains('loaded');
         const isBoat = el.classList.contains('boat-slot');
@@ -1158,7 +1212,6 @@
         refresh();
         db.child(id).set(willLoad ? true : null);
 
-        // Play the completion sound (continues naturally from the rising/falling tone)
         if (willLoad) {
           playTick(isBoat);
           spawnRipple(btn);
@@ -1167,20 +1220,17 @@
           playUntick();
         }
 
-        cleanupRing();
+        cleanupPulse();
       }, HOLD_MS);
     }
 
     function cancelPress() {
-      if (pressTimer) {
-        clearTimeout(pressTimer);
-        pressTimer = null;
-      }
-      // Stop the tone if they released early
+      if (pressTimer) { clearTimeout(pressTimer); pressTimer = null; }
+      if (sonarInterval) { clearInterval(sonarInterval); sonarInterval = null; }
       stopPressTone(pressTone);
       pressTone = null;
       el.classList.remove('pressing');
-      cleanupRing();
+      cleanupPulse();
     }
 
     function moveCheck(e) {
@@ -1188,16 +1238,11 @@
       const touch = e.touches ? e.touches[0] : e;
       const dx = Math.abs(touch.clientX - startX);
       const dy = Math.abs(touch.clientY - startY);
-      if (dx > MOVE_THRESHOLD || dy > MOVE_THRESHOLD) {
-        cancelPress();
-      }
+      if (dx > MOVE_THRESHOLD || dy > MOVE_THRESHOLD) cancelPress();
     }
 
-    function cleanupRing() {
-      if (ring) {
-        ring.remove();
-        ring = null;
-      }
+    function cleanupPulse() {
+      if (pulse) { pulse.remove(); pulse = null; }
     }
 
     // Touch events (mobile)
