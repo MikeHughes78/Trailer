@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>EUBC BUCS trailer plan</title>
+<title>EUBC Trailer Loading Plan — BUCS Regatta 2026</title>
 <link href="https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@300;400;600;700&family=SF+Pro+Text:wght@400;500;600&family=JetBrains+Mono:wght@500;700&family=Pacifico&display=swap" rel="stylesheet">
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
@@ -792,14 +792,14 @@
 
   <!-- Header -->
   <div class="header glass">
-    <h1><span class="blue">EUBC</span> BUCS trailer plan</h1>
-    <p>Long press each item when loaded</p>
+    <h1><span class="blue">EUBC</span> Trailer Loading Plan</h1>
+    <p>BUCS Regatta 2026 · Tap each item when loaded</p>
   </div>
 
   <!-- Progress -->
   <div class="progress-section glass">
     <div class="progress-label">
-      <span>Progress</span>
+      <span>Loading progress</span>
       <span><strong id="loadedCount">0</strong> / <span id="totalCount">82</span></span>
     </div>
     <div class="progress-track">
@@ -814,7 +814,7 @@
     <div class="trailer-wrap">
       <div class="eubc-diagram">
         <div class="eubc-top-row">
-          <div class="boat-slot" data-id="ehu282"><button class="load-btn"></button><span class="boat-name">EHU282</span></div>
+          <div class="boat-slot" data-id="sr-2x"><button class="load-btn"></button><span class="boat-name">Scottish Rowing 2x</span></div>
           <div class="boat-slot" data-id="ehu290"><button class="load-btn"></button><span class="boat-name">EHU290</span></div>
           <div class="boat-slot" data-id="ehu291"><button class="load-btn"></button><span class="boat-name">EHU291</span></div>
           <div class="boat-slot" data-id="ehu292"><button class="load-btn"></button><span class="boat-name">EHU292</span></div>
@@ -855,10 +855,11 @@
     <!-- SR TRAILER -->
     <div class="trailer-wrap">
       <div class="sr-diagram">
-        <div class="sr-top-row">
+        <div class="sr-top-row" style="grid-template-columns: 1fr 1fr 1fr 1fr;">
           <div class="boat-slot" data-id="plank"><button class="load-btn"></button><span class="boat-name">Plank</span></div>
           <div class="boat-slot" data-id="matthews"><button class="load-btn"></button><span class="boat-name">Matthews</span></div>
           <div class="boat-slot" data-id="ehu192"><button class="load-btn"></button><span class="boat-name">EHU192</span></div>
+          <div class="boat-slot" data-id="sr-1x"><button class="load-btn"></button><span class="boat-name">SR 1x</span></div>
         </div>
         <div class="sr-frame">
           <div class="div-1"></div>
@@ -869,16 +870,16 @@
             <div class="boat-slot" data-id="ehu490"><button class="load-btn"></button><span class="boat-name">EHU490</span></div>
           </div>
           <div class="sr-rack">
-            <div class="boat-slot" data-id="ehu480"><button class="load-btn"></button><span class="boat-name">EHU480</span></div>
-            <div class="boat-slot" data-id="kg-ii-ls"><button class="load-btn"></button><span class="boat-name">KG II long section</span></div>
+            <div class="boat-slot" data-id="kgii-ls"><button class="load-btn"></button><span class="boat-name">KGII long section</span></div>
+            <div class="boat-slot" data-id="ehu480"><button class="load-btn"></button><span class="boat-name">EHU 480</span></div>
             <div class="boat-slot" data-id="sarju"><button class="load-btn"></button><span class="boat-name">Sarju</span></div>
           </div>
           <div class="sr-rack">
+            <div class="boat-slot" data-id="kgii-ss"><button class="load-btn"></button><span class="boat-name">KGII short section</span></div>
             <div class="split-cell">
               <div class="boat-slot" data-id="ehu171"><button class="load-btn"></button><span class="boat-name">EHU 171</span></div>
               <div class="boat-slot" data-id="ehu170"><button class="load-btn"></button><span class="boat-name">EHU 170</span></div>
             </div>
-            <div class="boat-slot" data-id="kg-ii-ss"><button class="load-btn"></button><span class="boat-name">KG II short section</span></div>
             <div class="split-cell">
               <div class="boat-slot" data-id="ehu173"><button class="load-btn"></button><span class="boat-name">EHU 173</span></div>
               <div class="boat-slot" data-id="ehu174"><button class="load-btn"></button><span class="boat-name">EHU 174</span></div>
@@ -913,7 +914,6 @@
         <div class="rigger-row"><span class="r-name">EHU270</span><div class="r-cell"><button class="rigger-btn na">—</button></div><div class="r-cell"><button class="rigger-btn" data-id="rig-ehu270-scull"></button></div></div>
         <div class="rigger-row"><span class="r-name">EHU271</span><div class="r-cell"><button class="rigger-btn" data-id="rig-ehu271-sweep"></button></div><div class="r-cell"><button class="rigger-btn" data-id="rig-ehu271-scull"></button></div></div>
         <div class="rigger-row"><span class="r-name">EHU280</span><div class="r-cell"><button class="rigger-btn" data-id="rig-ehu280-sweep"></button></div><div class="r-cell"><button class="rigger-btn" data-id="rig-ehu280-scull"></button></div></div>
-        <div class="rigger-row"><span class="r-name">EHU282</span><div class="r-cell"><button class="rigger-btn na">—</button></div><div class="r-cell"><button class="rigger-btn" data-id="rig-ehu282-scull"></button></div></div>
         <div class="rigger-row"><span class="r-name">EHU283</span><div class="r-cell"><button class="rigger-btn" data-id="rig-ehu283-sweep"></button></div><div class="r-cell"><button class="rigger-btn" data-id="rig-ehu283-scull"></button></div></div>
         <div class="rigger-row"><span class="r-name">EHU284</span><div class="r-cell"><button class="rigger-btn" data-id="rig-ehu284-sweep"></button></div><div class="r-cell"><button class="rigger-btn na">—</button></div></div>
         <div class="rigger-row"><span class="r-name">EHU290</span><div class="r-cell"><button class="rigger-btn na">—</button></div><div class="r-cell"><button class="rigger-btn" data-id="rig-ehu290-scull"></button></div></div>
@@ -989,8 +989,8 @@
   <div class="safety-banner">
     <div class="safety-icon">⚠</div>
     <div class="safety-text">
-      <div class="label">Pre-loading safety check</div>
-      <p>CHECK HEEL RESTRAINTS, HATCH COVERS, BOW BALLS, SHOE SCREWS BEFORE LOADING - report any concerns to a coach!</p>
+      <div class="label">Pre-Loading Safety Check</div>
+      <p>CHECK HEEL RESTRAINTS, HATCH COVERS, BOW BALLS, SHOE SCREWS BEFORE LOADING</p>
     </div>
   </div>
 
