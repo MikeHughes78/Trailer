@@ -12,19 +12,12 @@
   <link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:wght@400;700&display=swap" rel="stylesheet">
 
   <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
 
-    html,
-    body {
-      height: 100%;
-    }
+    html, body { height: 100%; }
 
     body {
-      font-family: "Libre Baskerville", Georgia, "Times New Roman", serif;
+      font-family: "Libre Baskerville", Georgia, serif;
       color: #f5f2ec;
       overflow: hidden;
       background: #231e19;
@@ -35,7 +28,6 @@
       height: 100vh;
       width: 100%;
       overflow: hidden;
-      background: #231e19;
     }
 
     .bg-image,
@@ -51,7 +43,10 @@
     .bg-image {
       background: url("4+canal.jpg") no-repeat center 35% / cover;
       z-index: 0;
-      animation: imageCycle 30s ease-in-out infinite;
+      transform-origin: center;
+      animation:
+        imageCycle 30s ease-in-out infinite,
+        kenBurns 30s ease-in-out infinite;
     }
 
     .bg-video {
@@ -66,7 +61,6 @@
       inset: 0;
       z-index: 2;
       background: rgba(35, 30, 25, 0.58);
-      pointer-events: none;
     }
 
     .content {
@@ -88,9 +82,6 @@
       letter-spacing: -0.02em;
       line-height: 0.95;
       opacity: 0;
-      filter: none !important;
-      -webkit-filter: none !important;
-      text-shadow: none;
       animation: titleReveal 6s ease forwards;
     }
 
@@ -107,7 +98,6 @@
       margin-top: 1rem;
       display: flex;
       flex-direction: column;
-      align-items: center;
       gap: 0.65rem;
       opacity: 0;
       animation: fadeInSoft 1s ease 2s forwards;
@@ -122,90 +112,61 @@
       transition: color 0.3s ease;
     }
 
-    .footer-links a::after {
-      content: "";
-      display: block;
-      width: 0;
-      height: 1px;
-      background: rgba(245, 242, 236, 0.5);
-      margin-top: 6px;
-      transition: width 0.3s ease;
-    }
-
     .footer-links a:hover {
       color: rgba(245, 242, 236, 0.85);
     }
 
-    .footer-links a:hover::after {
-      width: 100%;
-    }
+    /* Timeline:
+       0–5s   still (Ken Burns active)
+       5–7s   fade to video
+       7–28s  video (21s)
+       28–30s fade back
+    */
 
     @keyframes imageCycle {
-      0%, 16.5% {
-        opacity: 1;
-      }
-
-      23%, 93% {
-        opacity: 0;
-      }
-
-      100% {
-        opacity: 1;
-      }
+      0%, 16.5% { opacity: 1; }
+      23%, 93% { opacity: 0; }
+      100% { opacity: 1; }
     }
 
     @keyframes videoCycle {
-      0%, 16.5% {
-        opacity: 0;
+      0%, 16.5% { opacity: 0; }
+      23%, 93% { opacity: 1; }
+      100% { opacity: 0; }
+    }
+
+    @keyframes kenBurns {
+      0% {
+        transform: scale(1) translate(0, 0);
+      }
+
+      16.5% {
+        transform: scale(1.06) translate(-1%, -1%);
       }
 
       23%, 93% {
-        opacity: 1;
+        transform: scale(1.06) translate(-1%, -1%);
       }
 
       100% {
-        opacity: 0;
+        transform: scale(1) translate(0, 0);
       }
     }
 
     @keyframes titleReveal {
-      0% {
-        opacity: 0;
-        filter: none;
-        -webkit-filter: none;
-      }
-
-      35% {
-        opacity: 1;
-        filter: none;
-        -webkit-filter: none;
-      }
-
-      100% {
-        opacity: 0.5;
-        filter: none;
-        -webkit-filter: none;
-      }
+      0% { opacity: 0; }
+      100% { opacity: 0.5; }
     }
 
     @keyframes fadeInSoft {
-      from {
-        opacity: 0;
-      }
-
-      to {
-        opacity: 0.75;
-      }
+      from { opacity: 0; }
+      to { opacity: 0.75; }
     }
 
     @media (max-width: 640px) {
       .bg-image,
       .bg-video {
         object-position: center 30%;
-      }
-
-      .bg-image {
-        background-position: center 30%;
       }
 
       .content {
@@ -227,10 +188,6 @@
       .bg-image,
       .bg-video {
         object-position: center 25%;
-      }
-
-      .bg-image {
-        background-position: center 25%;
       }
 
       .content {
@@ -266,7 +223,6 @@
 
     <video
       class="bg-video"
-      autoplay
       muted
       loop
       playsinline
@@ -292,16 +248,7 @@
     const video = document.querySelector(".bg-video");
 
     function attemptPlay() {
-      if (!video) return;
-
-      video.muted = true;
-      video.playsInline = true;
-
-      const playPromise = video.play();
-
-      if (playPromise !== undefined) {
-        playPromise.catch(() => {});
-      }
+      video.play().catch(() => {});
     }
 
     window.addEventListener("load", attemptPlay);
@@ -315,10 +262,6 @@
       video.currentTime = 0;
       video.play().catch(() => {});
     }, { once: true });
-
-    document.addEventListener("visibilitychange", () => {
-      if (!document.hidden) attemptPlay();
-    });
   </script>
 </body>
 </html>
