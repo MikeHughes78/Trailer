@@ -12,15 +12,9 @@
   <link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:wght@400;700&display=swap" rel="stylesheet">
 
   <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
 
-    html, body {
-      height: 100%;
-    }
+    html, body { height: 100%; }
 
     body {
       font-family: "Libre Baskerville", Georgia, "Times New Roman", serif;
@@ -64,7 +58,6 @@
       inset: 0;
       z-index: 2;
       background: rgba(35, 30, 25, 0.58);
-      pointer-events: none;
     }
 
     .content {
@@ -86,8 +79,7 @@
       letter-spacing: -0.02em;
       line-height: 0.95;
       opacity: 0;
-      filter: blur(6px);
-      animation: titleReveal 6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+      animation: titleReveal 6s ease forwards;
     }
 
     .divider {
@@ -103,7 +95,6 @@
       margin-top: 1rem;
       display: flex;
       flex-direction: column;
-      align-items: center;
       gap: 0.65rem;
       opacity: 0;
       animation: fadeInSoft 1s ease 2s forwards;
@@ -115,134 +106,28 @@
       text-transform: uppercase;
       color: rgba(245, 242, 236, 0.55);
       text-decoration: none;
-      transition: color 0.3s ease;
     }
-
-    .footer-links a::after {
-      content: "";
-      display: block;
-      width: 0;
-      height: 1px;
-      background: rgba(245, 242, 236, 0.5);
-      margin-top: 6px;
-      transition: width 0.3s ease;
-    }
-
-    .footer-links a:hover {
-      color: rgba(245, 242, 236, 0.85);
-    }
-
-    .footer-links a:hover::after {
-      width: 100%;
-    }
-
-    /* 30s timeline:
-       0–5s     still
-       5–7s     fade to video
-       7–28s    video (21s)
-       28–30s   fade back
-    */
 
     @keyframes imageCycle {
-      0%, 16.5% {
-        opacity: 1;
-        transform: scale(1);
-      }
-
-      23%, 93% {
-        opacity: 0;
-        transform: scale(1.04);
-      }
-
-      100% {
-        opacity: 1;
-        transform: scale(1);
-      }
+      0%, 16.5% { opacity: 1; }
+      23%, 93% { opacity: 0; }
+      100% { opacity: 1; }
     }
 
     @keyframes videoCycle {
-      0%, 16.5% {
-        opacity: 0;
-      }
-
-      23%, 93% {
-        opacity: 1;
-      }
-
-      100% {
-        opacity: 0;
-      }
+      0%, 16.5% { opacity: 0; }
+      23%, 93% { opacity: 1; }
+      100% { opacity: 0; }
     }
 
     @keyframes titleReveal {
-      0% {
-        opacity: 0;
-        filter: blur(6px);
-      }
-      35% {
-        opacity: 1;
-        filter: blur(0);
-      }
-      100% {
-        opacity: 0.5;
-      }
+      0% { opacity: 0; }
+      100% { opacity: 0.5; }
     }
 
     @keyframes fadeInSoft {
       from { opacity: 0; }
       to { opacity: 0.75; }
-    }
-
-    @media (max-width: 640px) {
-      .bg-image,
-      .bg-video {
-        object-position: center 30%;
-      }
-
-      .content {
-        top: 69%;
-        width: 92%;
-      }
-
-      h1 {
-        font-size: clamp(2.5rem, 11vw, 4.2rem);
-      }
-
-      .footer-links a {
-        font-size: 0.68rem;
-        letter-spacing: 0.14em;
-      }
-    }
-
-    @media (max-height: 500px) and (orientation: landscape) {
-      .bg-image,
-      .bg-video {
-        object-position: center 25%;
-      }
-
-      .content {
-        top: 72%;
-        width: 92%;
-      }
-
-      h1 {
-        font-size: clamp(2rem, 6vw, 3.6rem);
-      }
-
-      .divider {
-        width: 56px;
-        margin-top: 0.7rem;
-      }
-
-      .footer-links {
-        margin-top: 0.7rem;
-        gap: 0.35rem;
-      }
-
-      .footer-links a {
-        font-size: 0.58rem;
-        letter-spacing: 0.1em;
-      }
     }
   </style>
 </head>
@@ -251,7 +136,15 @@
   <div class="hero">
     <div class="bg-image"></div>
 
-    <video class="bg-video" autoplay muted loop playsinline poster="4+canal.jpg">
+    <video
+      class="bg-video"
+      muted
+      loop
+      playsinline
+      webkit-playsinline
+      preload="auto"
+      poster="4+canal.jpg"
+    >
       <source src="SCP-Pre-BUCS.mp4" type="video/mp4">
     </video>
 
@@ -265,5 +158,25 @@
       </div>
     </div>
   </div>
+
+  <script>
+    const video = document.querySelector(".bg-video");
+
+    function attemptPlay() {
+      video.play().catch(() => {});
+    }
+
+    // Try autoplay immediately (works on some devices)
+    window.addEventListener("load", attemptPlay);
+
+    // Fallback: first touch anywhere triggers playback
+    document.addEventListener("touchstart", () => {
+      video.play();
+    }, { once: true });
+
+    document.addEventListener("click", () => {
+      video.play();
+    }, { once: true });
+  </script>
 </body>
 </html>
