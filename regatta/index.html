@@ -135,94 +135,53 @@
     box-shadow: 0 2px 12px rgba(151,213,235,0.12), 0 1px 3px rgba(0,0,0,0.04);
   }
 
-  /* ─── TOP 3 PODIUM ─── */
-  .podium {
-    display: flex;
-    align-items: flex-end;
-    justify-content: center;
-    gap: 0.5rem;
-    padding: 1.5rem 1rem 1rem;
-    background: linear-gradient(180deg, var(--primary-ghost) 0%, transparent 100%);
-  }
-  .podium-slot {
-    display: flex;
-    flex-direction: column;
+  /* ─── TOP 3 ROWS ─── */
+  .top3-row {
+    display: grid;
+    grid-template-columns: 44px 1fr auto;
     align-items: center;
-    flex: 1;
-    max-width: 120px;
+    padding: 0.7rem 1rem;
+    border-bottom: 1px solid var(--card-border);
   }
-  .podium-slot.first { order: 2; }
-  .podium-slot.second { order: 1; }
-  .podium-slot.third { order: 3; }
+  .top3-row.first  { background: linear-gradient(90deg, var(--gold-bg), #fff); }
+  .top3-row.second { background: linear-gradient(90deg, var(--silver-bg), #fff); }
+  .top3-row.third  { background: linear-gradient(90deg, var(--bronze-bg), #fff); }
 
-  .podium-medal {
-    width: 36px; height: 36px;
+  .top3-medal {
+    width: 32px; height: 32px;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
     font-weight: 700;
     font-size: 0.85rem;
-    margin-bottom: 0.4rem;
+    flex-shrink: 0;
   }
-  .first .podium-medal {
-    width: 44px; height: 44px;
-    font-size: 1rem;
-    background: linear-gradient(135deg, #f5d76e, #d4a017);
-    color: #5a3e00;
-    box-shadow: 0 2px 10px rgba(212,160,23,0.25);
-  }
-  .second .podium-medal {
-    background: linear-gradient(135deg, #e4eaf0, #a8b8c6);
-    color: #3a4a56;
-  }
-  .third .podium-medal {
-    background: linear-gradient(135deg, #dba06b, #b87333);
-    color: #3e2510;
-  }
+  .first  .top3-medal { background: linear-gradient(135deg, #f5d76e, #d4a017); color: #5a3e00; box-shadow: 0 2px 8px rgba(212,160,23,0.25); }
+  .second .top3-medal { background: linear-gradient(135deg, #e4eaf0, #a8b8c6); color: #3a4a56; }
+  .third  .top3-medal { background: linear-gradient(135deg, #dba06b, #b87333); color: #3e2510; }
 
-  .podium-name {
-    font-size: 0.78rem;
+  .top3-club {
     font-weight: 600;
-    text-align: center;
-    line-height: 1.2;
-    margin-bottom: 0.2rem;
+    font-size: 0.9rem;
     color: var(--text);
+    padding: 0 0.5rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
-  .first .podium-name { font-size: 0.85rem; }
+  .first .top3-club { font-size: 0.95rem; }
 
-  .podium-pts {
-    font-size: 0.95rem;
+  .top3-pts {
     font-weight: 700;
+    font-size: 0.95rem;
     font-variant-numeric: tabular-nums;
+    text-align: right;
+    min-width: 42px;
   }
-  .first .podium-pts { color: var(--gold); font-size: 1.1rem; }
-  .second .podium-pts { color: var(--silver); }
-  .third .podium-pts { color: var(--bronze); }
-
-  .podium-bar {
-    width: 100%;
-    border-radius: 6px 6px 0 0;
-    margin-top: 0.4rem;
-  }
-  .first .podium-bar {
-    height: 64px;
-    background: linear-gradient(180deg, var(--gold-bg), rgba(253,246,227,0.3));
-    border: 1px solid rgba(212,160,23,0.15);
-    border-bottom: none;
-  }
-  .second .podium-bar {
-    height: 44px;
-    background: linear-gradient(180deg, var(--silver-bg), rgba(240,243,246,0.3));
-    border: 1px solid rgba(138,155,170,0.12);
-    border-bottom: none;
-  }
-  .third .podium-bar {
-    height: 30px;
-    background: linear-gradient(180deg, var(--bronze-bg), rgba(250,240,230,0.3));
-    border: 1px solid rgba(184,115,51,0.12);
-    border-bottom: none;
-  }
+  .first  .top3-pts { color: var(--gold); }
+  .second .top3-pts { color: var(--silver); }
+  .third  .top3-pts { color: var(--bronze); }
 
   /* ─── TABLE ROWS ─── */
   .rows {
@@ -320,7 +279,6 @@
   /* hide scrollbar on whole page on mobile */
   @media (max-width: 520px) {
     .board-wrap { padding: 0.5rem; }
-    .podium { padding: 1.2rem 0.5rem 0.8rem; gap: 0.3rem; }
     .row { padding: 0.55rem 0.75rem; }
   }
 </style>
@@ -1616,7 +1574,7 @@
 
 <script>
 // ─── CONFIG ───
-const SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSa6hutAyunAB6--x0cx_ShY-KXBJsR8v42BXrLlG4JYX3tgV9NXHEgH96FWt6nE0mg8A_uNnorTlr3/pub?gid=474748749&single=true&output=csv';
+const SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSa6hutAyunAB6--x0cx_ShY-KXBJsR8v42BXrLlG4JYX3tgV9NXHEgH96FWt6nE0mg8A_uNnorTlr3/pub?gid=1473886220&single=true&output=csv';
 
 // ─── STATE ───
 let data = {};      // { overall_vl: [{club, pts}], mens_vl: [...], ... }
@@ -1733,7 +1691,7 @@ function render() {
 
   if (entries.length === 0) {
     if (data._connected && !data._hasResults) {
-      board.innerHTML = '<div class="empty-state"><div class="icon">🏁</div><p>Sheet is connected.<br>No results entered yet, the leaderboard will update automatically once finals are concluded.</p></div>';
+      board.innerHTML = '<div class="empty-state"><div class="icon">🏁</div><p>Sheet connected successfully!<br>No results entered yet — the leaderboard will update automatically once club names are added to the Events sheet.</p></div>';
     } else if (data._connected) {
       board.innerHTML = '<div class="empty-state"><div class="icon">🏁</div><p>No results in this category yet.<br>Try another tab above.</p></div>';
     } else {
@@ -1744,27 +1702,20 @@ function render() {
 
   let html = '';
 
-  // Top 3 podium
-  if (entries.length >= 3) {
-    html += '<div class="podium">';
-    const podiumClasses = ['second', 'first', 'third'];
-    const podiumOrder = [1, 0, 2]; // display order: 2nd, 1st, 3rd
-    for (const idx of podiumOrder) {
-      const e = entries[idx];
-      const cls = podiumClasses[podiumOrder.indexOf(idx)];
-      html += `
-        <div class="podium-slot ${['first','second','third'][idx]}">
-          <div class="podium-medal">${idx + 1}</div>
-          <div class="podium-name">${escHtml(e.club)}</div>
-          <div class="podium-pts">${e.pts.toLocaleString()}</div>
-          <div class="podium-bar"></div>
-        </div>`;
-    }
-    html += '</div>';
+  // Top 3 stacked rows
+  const top3Classes = ['first', 'second', 'third'];
+  const topCount = Math.min(entries.length, 3);
+  for (let i = 0; i < topCount; i++) {
+    html += `
+      <div class="top3-row ${top3Classes[i]}">
+        <div class="top3-medal">${i + 1}</div>
+        <div class="top3-club">${escHtml(entries[i].club)}</div>
+        <div class="top3-pts">${entries[i].pts.toLocaleString()}</div>
+      </div>`;
   }
 
-  // Remaining rows (from 4th onward, or all if < 3)
-  const startIdx = entries.length >= 3 ? 3 : 0;
+  // Remaining rows (4th onward)
+  const startIdx = Math.min(entries.length, 3);
   if (startIdx < entries.length) {
     html += '<div class="rows">';
     for (let i = startIdx; i < entries.length; i++) {
@@ -1819,4 +1770,3 @@ init();
 </script>
 </body>
 </html>
-
